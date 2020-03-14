@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/city"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/cityName"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/temp"
+            android:textSize="42sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/city" />
+
+        <TextView
+            android:id="@+id/weatherDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stringWeatherDescription"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toStartOf="@+id/wind"
+            app:layout_constraintStart_toEndOf="@+id/temperature"
+            app:layout_constraintTop_toTopOf="@+id/temperature" />
+
+        <TextView
+            android:id="@+id/wcf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/windChillFactor"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="@+id/weatherDescription"
+            app:layout_constraintTop_toBottomOf="@+id/weatherDescription" />
+
+        <TextView
+            android:id="@+id/wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:text="@string/windSpeedAndDirection"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/weatherDescription" />
+
+        <TextView
+            android:id="@+id/humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/stringHumid"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="@+id/wind"
+            app:layout_constraintTop_toBottomOf="@+id/wind" />
+        <Button
+            android:id="@+id/buttonToday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/buttonToday"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintEnd_toStartOf="@id/buttonTomorrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/humidity" />
+
+        <Button
+            android:id="@+id/buttonTomorrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buttonTom"
+            app:layout_constraintEnd_toStartOf="@id/buttonAfterTomorrow"
+            app:layout_constraintStart_toEndOf="@id/buttonToday"
+            app:layout_constraintTop_toTopOf="@id/buttonToday" />
+
+        <Button
+            android:id="@+id/buttonAfterTomorrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buttonAfterTom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/buttonTomorrow"
+            app:layout_constraintTop_toTopOf="@id/buttonTomorrow" />
+
+        <TextView
+            android:id="@+id/textContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stringContent"
+            android:textSize="24sp"
+            app:layout_constraintTop_toBottomOf="@id/buttonToday"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

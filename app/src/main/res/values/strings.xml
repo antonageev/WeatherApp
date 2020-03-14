@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">WeatherApp</string>
+    <string name="cityName">Moscow</string>
+    <string name="buttonToday">Today</string>
+    <string name="buttonTom">Tomorrow</string>
+    <string name="buttonAfterTom">After Tomorrow</string>
+    <string name="temp">6 C</string>
+    <string name="windSpeedAndDirection">Wind: NW, 2 m/s</string>
+    <string name="windChillFactor">feels like: 3 C</string>
+    <string name="stringHumid">Humidity: 85%</string>
+    <string name="stringWeatherDescription">Cloudy</string>
+    <string name="stringContent">hourly forecast for today using ViewPager</string>
+    <string name="stringContentTom">hourly forecast for Tomorrow using ViewPager</string>
+    <string name="stringContentAfterTom">hourly forecast for AfterTomorrow using ViewPager</string>
+</resources>

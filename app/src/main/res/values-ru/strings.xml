@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cityName">Москва</string>
+    <string name="buttonToday">Сегодня</string>
+    <string name="buttonTom">Завтра</string>
+    <string name="buttonAfterTom">Послезавтра</string>
+    <string name="temp">6 С</string>
+    <string name="windSpeedAndDirection">Ветер: СЗ, 2 м/с</string>
+    <string name="windChillFactor">Ощущается: 3 С</string>
+    <string name="stringHumid">Влажность: 85%</string>
+    <string name="stringWeatherDescription">Облачно</string>
+    <string name="stringContent">Почасовой прогноз на СЕГОДНЯ через ViewPager</string>
+    <string name="stringContentTom">Почасовой прогноз на ЗАВТРА через ViewPager</string>
+    <string name="stringContentAfterTom">Почасовой прогноз на ПОСЛЕЗАВТРА</string>
+</resources>
