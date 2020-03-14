@@ -12,4 +12,11 @@
     <string name="stringContent">Почасовой прогноз на СЕГОДНЯ через ViewPager</string>
     <string name="stringContentTom">Почасовой прогноз на ЗАВТРА через ViewPager</string>
     <string name="stringContentAfterTom">Почасовой прогноз на ПОСЛЕЗАВТРА</string>
+    <string name="backButton">Back</string>
+    <string name="findButton">Find</string>
+    <string name="buttonChangeCity">Cities</string>
+    <string name="textCity1">New York</string>
+    <string name="textWeather">Bright</string>
+    <string name="textTemperature">13 C</string>
+    <string name="textCity2">Tokyo</string>
 </resources>

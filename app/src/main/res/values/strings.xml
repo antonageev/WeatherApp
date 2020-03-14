@@ -12,4 +12,12 @@
     <string name="stringContent">hourly forecast for today using ViewPager</string>
     <string name="stringContentTom">hourly forecast for Tomorrow using ViewPager</string>
     <string name="stringContentAfterTom">hourly forecast for AfterTomorrow using ViewPager</string>
+    <string name="enter_city_name">enter City name</string>
+    <string name="backButton">Back</string>
+    <string name="findButton">Find</string>
+    <string name="buttonChangeCity">Cities</string>
+    <string name="textCity1">New York</string>
+    <string name="textWeather">Bright</string>
+    <string name="textTemperature">13 C</string>
+    <string name="textCity2">Tokyo</string>
 </resources>
