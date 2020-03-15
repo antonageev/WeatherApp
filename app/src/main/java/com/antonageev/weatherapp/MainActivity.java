@@ -1,8 +1,10 @@
 package com.antonageev.weatherapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +16,10 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonToday;
     private Button buttonTomorrow;
     private Button buttonAfterTomorrow;
+    private ImageButton citiesSelect;
+    private ImageButton buttonSettings;
+    private Intent intentToCitiesSelect;
+    private Intent intentToSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,18 @@ public class MainActivity extends AppCompatActivity {
                 textContent.setText(R.string.stringContentAfterTom);
             }
         });
+        buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intentToSettings);
+            }
+        });
+        citiesSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(intentToCitiesSelect);
+            }
+        });
     }
 
     private void initViews(){
@@ -53,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
         buttonToday = findViewById(R.id.buttonToday);
         buttonTomorrow = findViewById(R.id.buttonTomorrow);
         buttonAfterTomorrow = findViewById(R.id.buttonAfterTomorrow);
+        citiesSelect = findViewById(R.id.citiesSelect);
+        buttonSettings = findViewById(R.id.buttonSettings);
+        intentToCitiesSelect = new Intent(this, SelectCityActivity.class);
+        intentToSettings = new Intent(this, SettingsActivity.class);
     }
 
 }

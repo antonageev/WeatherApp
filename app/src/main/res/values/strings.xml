@@ -20,4 +20,15 @@
     <string name="textWeather">Bright</string>
     <string name="textTemperature">13 C</string>
     <string name="textCity2">Tokyo</string>
+    <string name="cloudy_rainy">Rainy</string>
+    <string name="settings">Settings</string>
+    <string name="textDarkTheme">Dark theme</string>
+    <string name="textSwitchDarkThemeOff">Off</string>
+    <string name="textSwitchDarkThemeOn">On</string>
+    <string name="wind_speed">Wind speed</string>
+    <string name="metersPerSecond">m/s</string>
+    <string name="kilometers">km/h</string>
+    <string name="settingsTemperature">Temperature</string>
+    <string name="settingsTextCelsius">Cels</string>
+    <string name="settingsTextFahrenheit">Fh</string>
 </resources>
