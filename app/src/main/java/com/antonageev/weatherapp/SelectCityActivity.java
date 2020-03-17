@@ -10,7 +10,6 @@ import android.widget.Button;
 public class SelectCityActivity extends AppCompatActivity {
 
     private Button backButton;
-    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,14 +21,13 @@ public class SelectCityActivity extends AppCompatActivity {
 
     private void initViews(){
         backButton = findViewById(R.id.backButton);
-        intent = new Intent(this, MainActivity.class);
     }
 
     private void setListeners(){
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(intent);
+                onBackPressed();
             }
         });
     }
