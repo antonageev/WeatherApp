@@ -3,11 +3,11 @@ package com.antonageev.weatherapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -16,11 +16,18 @@ public class SettingsActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
     private Button backButton;
     private Switch switchDarkTheme;
+    private RadioButton windMetersPerSecond;
+    private RadioButton windKmPerHour;
+    private RadioButton tempCels;
+    private RadioButton tempFh;
+
+    private SettingsHandler settingsHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        settingsHandler = SettingsHandler.getInstance();
         initViews();
         setListeners();
         String savedInstance;
@@ -31,6 +38,84 @@ public class SettingsActivity extends AppCompatActivity {
         }
         Toast.makeText(this, TAG + " " + savedInstance +" - onCreate", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onCreate()");
+
+
+        switchDarkTheme.setChecked(settingsHandler.isDarkTheme());
+        setTextToSwitcher();
+        windMetersPerSecond.setChecked(settingsHandler.isMetersPerSecondChecked());
+        windKmPerHour.setChecked(settingsHandler.isKmPerHourChecked());
+        tempCels.setChecked(settingsHandler.isCelsChecked());
+        tempFh.setChecked(settingsHandler.isFhChecked());
+
+    }
+
+    private void initViews(){
+        backButton = findViewById(R.id.backButton);
+        switchDarkTheme = findViewById(R.id.switchDarkTheme);
+        windMetersPerSecond = findViewById(R.id.radioButtonMS);
+        windKmPerHour = findViewById(R.id.radioButtonKmHour);
+        tempCels = findViewById(R.id.radioButtonCelsius);
+        tempFh = findViewById(R.id.radioButtonFahrenheit);
+    }
+
+    private void setListeners(){
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        switchDarkTheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTextToSwitcher();
+                settingsHandler.setDarkTheme(switchDarkTheme.isChecked());
+            }
+        });
+        windMetersPerSecond.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (windMetersPerSecond.isChecked()) {
+                    settingsHandler.setMetersPerSecondChecked(true);
+                    settingsHandler.setKmPerHourChecked(false);
+                }
+            }
+        });
+        windKmPerHour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (windKmPerHour.isChecked()){
+                    settingsHandler.setKmPerHourChecked(true);
+                    settingsHandler.setMetersPerSecondChecked(false);
+                }
+            }
+        });
+        tempCels.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (tempCels.isChecked()){
+                    settingsHandler.setCelsChecked(true);
+                    settingsHandler.setFhChecked(false);
+                }
+            }
+        });
+        tempFh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (tempFh.isChecked()){
+                    settingsHandler.setFhChecked(true);
+                    settingsHandler.setCelsChecked(false);
+                }
+            }
+        });
+    }
+
+    private void setTextToSwitcher() {
+        if (switchDarkTheme.isChecked()) {
+            switchDarkTheme.setText(R.string.textSwitchDarkThemeOn);
+        } else {
+            switchDarkTheme.setText(R.string.textSwitchDarkThemeOff);
+        }
     }
 
     @Override
@@ -95,27 +180,4 @@ public class SettingsActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy()");
     }
 
-    private void initViews(){
-        backButton = findViewById(R.id.backButton);
-        switchDarkTheme = findViewById(R.id.switchDarkTheme);
-    }
-
-    private void setListeners(){
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-        switchDarkTheme.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (switchDarkTheme.isChecked()){
-                    switchDarkTheme.setText(R.string.textSwitchDarkThemeOn);
-                } else {
-                    switchDarkTheme.setText(R.string.textSwitchDarkThemeOff);
-                }
-            }
-        });
-    }
 }
