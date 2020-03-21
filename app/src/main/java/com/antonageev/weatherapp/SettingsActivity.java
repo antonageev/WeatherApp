@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         setTextToSwitcher();
         windMetersPerSecond.setChecked(settingsHandler.isMetersPerSecondChecked());
         windKmPerHour.setChecked(settingsHandler.isKmPerHourChecked());
-        tempCels.setChecked(settingsHandler.isCelsChecked());
+        tempCels.setChecked(settingsHandler.isCelsiusChecked());
         tempFh.setChecked(settingsHandler.isFhChecked());
 
     }
@@ -94,7 +94,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (tempCels.isChecked()){
-                    settingsHandler.setCelsChecked(true);
+                    settingsHandler.setCelsiusChecked(true);
                     settingsHandler.setFhChecked(false);
                 }
             }
@@ -104,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (tempFh.isChecked()){
                     settingsHandler.setFhChecked(true);
-                    settingsHandler.setCelsChecked(false);
+                    settingsHandler.setCelsiusChecked(false);
                 }
             }
         });
@@ -135,13 +135,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        String savedInstance;
-        if (savedInstanceState == null){
-            savedInstance = "NO saved data";
-        } else {
-            savedInstance = "Saved data EXISTS";
-        }
-        Toast.makeText(this, TAG + " " + savedInstance + "- onRestoreInstanceState", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, TAG + " - onRestoreInstanceState", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onRestoreInstanceState()");
     }
 

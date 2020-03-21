@@ -1,6 +1,6 @@
 package com.antonageev.weatherapp;
 
-public final class SettingsHandler {
+final class SettingsHandler {
 
     private static SettingsHandler instance = null;
 
@@ -9,46 +9,46 @@ public final class SettingsHandler {
     private boolean darkTheme;
     private boolean MetersPerSecondChecked;
     private boolean KmPerHourChecked;
-    private boolean CelsChecked;
+    private boolean CelsiusChecked;
     private boolean FhChecked;
 
-    public void setDarkTheme(boolean darkTheme) {
+    void setDarkTheme(boolean darkTheme) {
         this.darkTheme = darkTheme;
     }
 
-    public boolean isDarkTheme() {
+    boolean isDarkTheme() {
         return darkTheme;
     }
 
-    public boolean isMetersPerSecondChecked() {
+    boolean isMetersPerSecondChecked() {
         return MetersPerSecondChecked;
     }
 
-    public void setMetersPerSecondChecked(boolean metersPerSecondChecked) {
+    void setMetersPerSecondChecked(boolean metersPerSecondChecked) {
         MetersPerSecondChecked = metersPerSecondChecked;
     }
 
-    public boolean isKmPerHourChecked() {
+    boolean isKmPerHourChecked() {
         return KmPerHourChecked;
     }
 
-    public void setKmPerHourChecked(boolean kmPerHourChecked) {
+    void setKmPerHourChecked(boolean kmPerHourChecked) {
         KmPerHourChecked = kmPerHourChecked;
     }
 
-    public boolean isCelsChecked() {
-        return CelsChecked;
+    boolean isCelsiusChecked() {
+        return CelsiusChecked;
     }
 
-    public void setCelsChecked(boolean celsChecked) {
-        CelsChecked = celsChecked;
+    void setCelsiusChecked(boolean celsiusChecked) {
+        CelsiusChecked = celsiusChecked;
     }
 
-    public boolean isFhChecked() {
+    boolean isFhChecked() {
         return FhChecked;
     }
 
-    public void setFhChecked(boolean fhChecked) {
+    void setFhChecked(boolean fhChecked) {
         FhChecked = fhChecked;
     }
 
@@ -56,11 +56,11 @@ public final class SettingsHandler {
         darkTheme = false;
         MetersPerSecondChecked = true;
         KmPerHourChecked = false;
-        CelsChecked = true;
+        CelsiusChecked = true;
         FhChecked = false;
     }
 
-    public static SettingsHandler getInstance(){
+    static SettingsHandler getInstance(){
         synchronized (mon){
             if (instance == null){
                 instance = new SettingsHandler();
