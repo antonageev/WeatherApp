@@ -62,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                finish();
             }
         });
         switchDarkTheme.setOnClickListener(new View.OnClickListener() {

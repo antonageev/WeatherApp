@@ -65,6 +65,17 @@
             app:layout_constraintTop_toBottomOf="@+id/wcf" />
 
         <TextView
+            android:id="@+id/wcf_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wcf_text"
+            android:textSize="24sp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@id/wcf"
+            app:layout_constraintTop_toBottomOf="@id/weatherDescription"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
             android:id="@+id/wcf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,8 +83,8 @@
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.51"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weatherDescription" />
+            app:layout_constraintStart_toEndOf="@id/wcf_text"
+            app:layout_constraintTop_toTopOf="@id/wcf_text" />
 
         <Button
             android:id="@+id/buttonToday"
