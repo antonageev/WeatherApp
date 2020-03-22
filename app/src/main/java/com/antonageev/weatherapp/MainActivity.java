@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_CODE_CITIES = 1;
+
+
     private final String TAG = this.getClass().getSimpleName();
 
     private TextView textContent;
@@ -25,13 +27,27 @@ public class MainActivity extends AppCompatActivity {
     private TextView weatherDescription;
     private TextView temperature;
     private TextView wcf;
+    private TextView wind;
+    private TextView humidity;
     private Button buttonToday;
     private Button buttonTomorrow;
     private Button buttonAfterTomorrow;
+    private Button aboutCity;
     private ImageButton citiesSelect;
     private ImageButton buttonSettings;
     private Intent intentToCitiesSelect;
     private Intent intentToSettings;
+
+    private final String CITY = "city";
+    private final String TEMPERATURE = "temperature";
+    private final String WEATHER = "weather";
+    private final String WIND_CHILL_FACTOR = "wcf";
+    private final String WIND = "wind";
+    private final String HUMIDITY = "humidity";
+    private final String CITY_URL = "cityUrl";
+
+    private String cityUrl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +73,18 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (resultCode == RESULT_OK){
-            city.setText(data.getStringExtra("city"));
-            weatherDescription.setText(data.getStringExtra("weather"));
-            temperature.setText(data.getStringExtra("temperature"));
-            wcf.setText(data.getStringExtra("wcf"));
+            try {
+                city.setText(data.getStringExtra("city"));
+                weatherDescription.setText(data.getStringExtra("weather"));
+                temperature.setText(data.getStringExtra("temperature"));
+                wcf.setText(data.getStringExtra("wcf"));
+                humidity.setText(data.getStringExtra("humidity"));
+                wind.setText(data.getStringExtra("wind"));
+                cityUrl = data.getStringExtra("cityUrl");
+            } catch (NullPointerException e){
+                Log.e(TAG, "Null pointer exception while receiving data from CitySelect Activity");
+            }
+
         }
     }
 
@@ -76,6 +100,13 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         Toast.makeText(this, TAG + " - onSaveInstanceState", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onSaveInstanceState()");
+        outState.putString(CITY, city.getText().toString());
+        outState.putString(TEMPERATURE, temperature.getText().toString());
+        outState.putString(WEATHER, weatherDescription.getText().toString());
+        outState.putString(WIND_CHILL_FACTOR, wcf.getText().toString());
+        outState.putString(WIND, wind.getText().toString());
+        outState.putString(HUMIDITY, humidity.getText().toString());
+        outState.putString(CITY_URL, cityUrl);
     }
 
     @Override
@@ -83,6 +114,13 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         Toast.makeText(this, TAG + " - onRestoreInstanceState", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onRestoreInstanceState()");
+        city.setText(savedInstanceState.getString(CITY));
+        temperature.setText(savedInstanceState.getString(TEMPERATURE));
+        weatherDescription.setText(savedInstanceState.getString(WEATHER));
+        wcf.setText(savedInstanceState.getString(WIND_CHILL_FACTOR));
+        wind.setText(savedInstanceState.getString(WIND));
+        humidity.setText(savedInstanceState.getString(HUMIDITY));
+        cityUrl = savedInstanceState.getString(CITY_URL);
     }
 
     @Override
@@ -157,6 +195,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intentToCitiesSelect, REQUEST_CODE_CITIES);
             }
         });
+        aboutCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse(cityUrl);
+                Intent intentViewCity = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intentViewCity);
+            }
+        });
     }
 
     private void initViews(){
@@ -170,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
         weatherDescription = findViewById(R.id.weatherDescription);
         temperature = findViewById(R.id.temperature);
         wcf = findViewById(R.id.wcf);
+        wind = findViewById(R.id.wind);
+        humidity = findViewById(R.id.humidity);
+        aboutCity = findViewById(R.id.aboutCity);
+        cityUrl = getResources().getString(R.string.urlMoscow); //default
     }
 
 }

@@ -18,6 +18,7 @@
             android:layout_height="48dp"
             android:text="@string/buttonChangeCity"
             android:scaleType="fitCenter"
+            android:contentDescription="@string/select_city"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/hamburger_icon"/>
@@ -38,6 +39,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="fitCenter"
+            android:contentDescription="@string/settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/gear_icon" />
@@ -147,6 +149,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/buttonToday" />
+
+        <Button
+            android:id="@+id/aboutCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_city"
+            app:layout_constraintBottom_toBottomOf="@+id/humidity"
+            app:layout_constraintEnd_toEndOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

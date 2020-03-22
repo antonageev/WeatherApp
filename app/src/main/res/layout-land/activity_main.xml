@@ -13,6 +13,7 @@
 
         <ImageButton
             android:id="@+id/citiesSelect"
+            android:contentDescription="@string/select_city"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="@string/buttonChangeCity"
@@ -32,10 +33,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/aboutCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about_city"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonSettings"
+            app:layout_constraintEnd_toStartOf="@+id/buttonSettings"
+            app:layout_constraintStart_toEndOf="@+id/city" />
+
         <ImageButton
             android:id="@+id/buttonSettings"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:contentDescription="@string/settings"
             android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -63,14 +74,24 @@
             app:layout_constraintTop_toTopOf="@+id/temperature" />
 
         <TextView
+            android:id="@+id/wcf_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wcf_text"
+            android:layout_marginTop="16dp"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toStartOf="@id/wcf"
+            app:layout_constraintTop_toBottomOf="@id/weatherDescription"
+            app:layout_constraintStart_toStartOf="@id/weatherDescription"/>
+
+        <TextView
             android:id="@+id/wcf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="@string/windChillFactor"
             android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="@+id/weatherDescription"
-            app:layout_constraintTop_toBottomOf="@+id/weatherDescription" />
+            app:layout_constraintStart_toEndOf="@id/wcf_text"
+            app:layout_constraintTop_toTopOf="@id/wcf_text" />
 
         <TextView
             android:id="@+id/wind"

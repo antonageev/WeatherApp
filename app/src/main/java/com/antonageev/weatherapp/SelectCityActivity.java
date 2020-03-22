@@ -45,6 +45,9 @@ public class SelectCityActivity extends AppCompatActivity {
         map.put("weather", "Cloudy");
         map.put("temperature", "13 C");
         map.put("wcf", "5 C");
+        map.put("humidity", "Humidity: 65%");
+        map.put("wind", "Wind: SW, 3 m/s");
+        map.put("cityUrl", getResources().getString(R.string.urlNewYork));
         citiesList.add(map);
 
         map = new HashMap<>();
@@ -52,6 +55,9 @@ public class SelectCityActivity extends AppCompatActivity {
         map.put("weather", "Shiny");
         map.put("temperature", "8 C");
         map.put("wcf", "0 C");
+        map.put("humidity", "Humidity: 50%");
+        map.put("wind", "Wind: E, 1 m/s");
+        map.put("cityUrl", getResources().getString(R.string.urlTokyo));
         citiesList.add(map);
 
         map = new HashMap<>();
@@ -59,6 +65,9 @@ public class SelectCityActivity extends AppCompatActivity {
         map.put("weather", "Rainy");
         map.put("temperature", "6 C");
         map.put("wcf", "-2 C");
+        map.put("humidity", "Humidity: 90%");
+        map.put("wind", "Wind: N, 8 m/s");
+        map.put("cityUrl", getResources().getString(R.string.urlMoscow));
         citiesList.add(map);
 
         return citiesList;
@@ -85,6 +94,9 @@ public class SelectCityActivity extends AppCompatActivity {
                 intentResult.putExtra("weather", rowData.get("weather"));
                 intentResult.putExtra("temperature", rowData.get("temperature"));
                 intentResult.putExtra("wcf", rowData.get("wcf"));
+                intentResult.putExtra("humidity", rowData.get("humidity"));
+                intentResult.putExtra("wind", rowData.get("wind"));
+                intentResult.putExtra("cityUrl", rowData.get("cityUrl"));
                 setResult(RESULT_OK, intentResult);
                 finish();
             }
