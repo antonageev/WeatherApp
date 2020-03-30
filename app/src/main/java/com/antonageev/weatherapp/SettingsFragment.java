@@ -28,11 +28,6 @@ public class SettingsFragment extends Fragment {
 
     private SettingsHandler settingsHandler;
 
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

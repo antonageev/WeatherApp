@@ -38,4 +38,31 @@
     <string name="urlNewYork">https://ru.wikipedia.org/wiki/Нью-Йорк</string>
     <string name="urlTokyo">https://ru.wikipedia.org/wiki/Токио</string>
     <string name="urlMoscow">https://ru.wikipedia.org/wiki/Москва</string>
+    <string-array name="days">
+        <item>Сегодня</item>
+        <item>Завтра</item>
+        <item>Послезавтра</item>
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+    </string-array>
+    <string-array name="weathers">
+        <item>Дождь</item>
+        <item>Солнечно</item>
+        <item>Снег</item>
+        <item>Дождь</item>
+        <item>Солнечно</item>
+        <item>Снег</item>
+        <item>Дождь</item>
+    </string-array>
+    <string-array name="maxTemperatures">
+        <item>16 C</item>
+        <item>8 C</item>
+        <item>-2 C</item>
+        <item>16 C</item>
+        <item>8 C</item>
+        <item>-2 C</item>
+        <item>-2 C</item>
+    </string-array>
 </resources>

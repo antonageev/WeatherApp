@@ -1,7 +1,9 @@
 package com.antonageev.weatherapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class SelectCityActivity extends AppCompatActivity {
 
@@ -9,5 +11,20 @@ public class SelectCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_city);
+        Toast.makeText(this, "SelectAct onCreate()", Toast.LENGTH_SHORT).show();
     }
+
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Toast.makeText(this, "SelectAct onRestore()", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Toast.makeText(this, "SelectAct onSaveInst()", Toast.LENGTH_SHORT).show();
+    }
+
 }

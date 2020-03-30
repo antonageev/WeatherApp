@@ -29,17 +29,18 @@ import static com.antonageev.weatherapp.MainFragment.PARCEL;
  */
 public class SelectCityFragment extends Fragment {
 
+    private final String TAG = this.getClass().getSimpleName();
+
     Parcel currentParcel;
     private Button backButton;
     private ListView listView;
     private List<Map<String, String>> citiesWeatherList;
+    private int currentPosition;
 
     private boolean mDualPane;
 
     public static SelectCityFragment create(int index){
-
         SelectCityFragment selectCityFragment = new SelectCityFragment();
-
         Bundle args = new Bundle();
         args.putInt("index", index);
         selectCityFragment.setArguments(args);
@@ -64,7 +65,8 @@ public class SelectCityFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable("currentCity", currentParcel);
+//        outState.putSerializable("currentCity", currentParcel);
+//        outState.putInt("currentPosition", currentPosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -73,11 +75,22 @@ public class SelectCityFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mDualPane = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
-        if (savedInstanceState != null){
-            currentParcel = (Parcel) savedInstanceState.getSerializable("currentCity");
+//        if (savedInstanceState != null){
+//            currentParcel = (Parcel) savedInstanceState.getSerializable("currentCity");
+//            currentPosition = Integer.parseInt(currentParcel.getMapData().get("index"));
+//            Log.d(TAG , "onActivityCreated - parcel was taken from savedInstanceState");
+//        }
+//        else {
+//            currentParcel = new Parcel(citiesWeatherList.get(0));
+        if (getFragmentManager().findFragmentById(R.id.mainFragment) != null) {
+            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
+            currentPosition = mainFragment.getLocalIndex();
+            Log.d(TAG, "onActivityCreated - currentPosition was got from mainFragment.getLocalIndex()");
         } else {
-            currentParcel = new Parcel(citiesWeatherList.get(0));
+            currentPosition = 0;
+            Log.d(TAG, "onActivityCreated - currentPosition was initialized to 0 due to mainFragment == NULL");
         }
+//        }
 
         SimpleAdapter adapter = new SimpleAdapter(getContext(), citiesWeatherList,
                 R.layout.list_item_cities,
@@ -87,24 +100,26 @@ public class SelectCityFragment extends Fragment {
 
         if (mDualPane){
             listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            showMainFragment(currentParcel);
-            Log.w("Show main fragment", "Launched");
+//            showMainFragment(currentParcel);
         }
     }
 
-    private void showMainFragment(Parcel parcel){
-        Log.wtf("showMainF : mDualPane", String.valueOf(mDualPane));
-        if (mDualPane){
-            //MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragmentLayout);
+    private void showMainFragment(Parcel parcel) {
+        Log.wtf(TAG, "showMainFragment - mDualPane: " + mDualPane);
+        if (mDualPane) {
+            Log.wtf(TAG , "mainFragment: " + getFragmentManager().findFragmentById(R.id.mainFragment));
+            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
+            Log.wtf(TAG, "LocalIndex == currentPosition: " + (mainFragment.getLocalIndex() == currentPosition));
 
-            //if (mainFragment == null){
-                MainFragment mainFragment = MainFragment.create(parcel);
-                Log.wtf("mainFragment", String.valueOf(mainFragment));
+            if ( mainFragment.getLocalIndex() != currentPosition ){
+                mainFragment = MainFragment.create(parcel);
+                listView.setItemChecked(currentPosition, true);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.mainFragmentLayout, mainFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 ft.commit();
-            //}
+            }
+
         } else {
             Intent intent = new Intent();
             intent.setClass(getActivity(), MainActivity.class);
@@ -130,17 +145,8 @@ public class SelectCityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Map<String, String> rowData = (Map<String, String>) parent.getItemAtPosition(position);
                 Parcel parcel = new Parcel(rowData);
-//                Intent intentResult = new Intent();
-//                intentResult.putExtra("city", rowData.get("city"));
-//                intentResult.putExtra("weather", rowData.get("weather"));
-//                intentResult.putExtra("temperature", rowData.get("temperature"));
-//                intentResult.putExtra("wcf", rowData.get("wcf"));
-//                intentResult.putExtra("humidity", rowData.get("humidity"));
-//                intentResult.putExtra("wind", rowData.get("wind"));
-//                intentResult.putExtra("cityUrl", rowData.get("cityUrl"));
+                currentPosition = position;
                 showMainFragment(parcel);
-//                setResult(RESULT_OK, intentResult);
-//                finish();
             }
         });
     }
@@ -149,6 +155,18 @@ public class SelectCityFragment extends Fragment {
         List<Map<String, String>> citiesList = new ArrayList<>();
 
         Map<String, String> map = new HashMap<>();
+        map.put("index", "0");
+        map.put("city", "Moscow");
+        map.put("weather", "Rainy");
+        map.put("temperature", "6 C");
+        map.put("wcf", "-2 C");
+        map.put("humidity", "Humidity: 90%");
+        map.put("wind", "Wind: N, 8 m/s");
+        map.put("cityUrl", getResources().getString(R.string.urlMoscow));
+        citiesList.add(map);
+
+        map = new HashMap<>();
+        map.put("index", "1");
         map.put("city", "NewYork");
         map.put("weather", "Cloudy");
         map.put("temperature", "13 C");
@@ -159,6 +177,7 @@ public class SelectCityFragment extends Fragment {
         citiesList.add(map);
 
         map = new HashMap<>();
+        map.put("index", "2");
         map.put("city", "Tokyo");
         map.put("weather", "Shiny");
         map.put("temperature", "8 C");
@@ -166,16 +185,6 @@ public class SelectCityFragment extends Fragment {
         map.put("humidity", "Humidity: 50%");
         map.put("wind", "Wind: E, 1 m/s");
         map.put("cityUrl", getResources().getString(R.string.urlTokyo));
-        citiesList.add(map);
-
-        map = new HashMap<>();
-        map.put("city", "Moscow");
-        map.put("weather", "Rainy");
-        map.put("temperature", "6 C");
-        map.put("wcf", "-2 C");
-        map.put("humidity", "Humidity: 90%");
-        map.put("wind", "Wind: N, 8 m/s");
-        map.put("cityUrl", getResources().getString(R.string.urlMoscow));
         citiesList.add(map);
 
         return citiesList;
