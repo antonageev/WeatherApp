@@ -13,13 +13,15 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Switch;
 
+import com.google.android.material.button.MaterialButton;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends Fragment {
 
-    private Button backButton;
+    private MaterialButton backButton;
     private Switch switchDarkTheme;
     private RadioButton windMetersPerSecond;
     private RadioButton windKmPerHour;

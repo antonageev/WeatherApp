@@ -38,6 +38,8 @@
     <string name="urlNewYork">https://ru.wikipedia.org/wiki/Нью-Йорк</string>
     <string name="urlTokyo">https://ru.wikipedia.org/wiki/Токио</string>
     <string name="urlMoscow">https://ru.wikipedia.org/wiki/Москва</string>
+    <string name="snackBarSure">Вы уверены?</string>
+    <string name="confirm">ОК</string>
     <string-array name="days">
         <item>Сегодня</item>
         <item>Завтра</item>

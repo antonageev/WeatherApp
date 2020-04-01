@@ -39,7 +39,7 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        final TextView textViewDay;
+        private TextView textViewDay;
         private TextView textViewWeather;
         private TextView textViewMaxTemperature;
 

@@ -2,12 +2,16 @@ package com.antonageev.weatherapp;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +21,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +41,9 @@ public class SelectCityFragment extends Fragment {
 
     Parcel currentParcel;
     private Button backButton;
-    private ListView listView;
     private List<Map<String, String>> citiesWeatherList;
     private int currentPosition;
+    private RecyclerView recyclerView;
 
     private boolean mDualPane;
 
@@ -91,17 +99,38 @@ public class SelectCityFragment extends Fragment {
             Log.d(TAG, "onActivityCreated - currentPosition was initialized to 0 due to mainFragment == NULL");
         }
 //        }
-
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), citiesWeatherList,
-                R.layout.list_item_cities,
-                new String[]{"city", "weather", "temperature"},
-                new int[]{R.id.text_view_city, R.id.text_view_weather, R.id.text_view_temperature});
-        listView.setAdapter(adapter);
+        initRecyclerView();
 
         if (mDualPane){
-            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//            showMainFragment(currentParcel);
+            backButton.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void initRecyclerView() {
+        CityListAdapter cityListAdapter = new CityListAdapter(citiesWeatherList);
+        LinearLayoutManager lt = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
+        recyclerView.setLayoutManager(lt);
+        cityListAdapter.setOnItemClickListener(new CityListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, final int position) {
+                Snackbar.make(view, getResources().getString(R.string.snackBarSure), BaseTransientBottomBar.LENGTH_SHORT).
+                        setAction(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                currentPosition = position;
+                                currentParcel = new Parcel(citiesWeatherList.get(position));
+                                showMainFragment(currentParcel);
+                            }
+                        }).show();
+            }
+        });
+        recyclerView.setAdapter(cityListAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
+        dividerItemDecoration.setDrawable(getActivity().getDrawable(R.drawable.separator));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+
     }
 
     private void showMainFragment(Parcel parcel) {
@@ -113,7 +142,6 @@ public class SelectCityFragment extends Fragment {
 
             if ( mainFragment.getLocalIndex() != currentPosition ){
                 mainFragment = MainFragment.create(parcel);
-                listView.setItemChecked(currentPosition, true);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.mainFragmentLayout, mainFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -130,23 +158,15 @@ public class SelectCityFragment extends Fragment {
 
     private void initViews(View view){
         backButton = view.findViewById(R.id.backButton);
-        listView = view.findViewById(R.id.listCities);
+        recyclerView = view.findViewById(R.id.recyclerView);
+
     }
 
     private void setListeners(){
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-            }
-        });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Map<String, String> rowData = (Map<String, String>) parent.getItemAtPosition(position);
-                Parcel parcel = new Parcel(rowData);
-                currentPosition = position;
-                showMainFragment(parcel);
+                getActivity().finish();
             }
         });
     }

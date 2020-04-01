@@ -21,6 +21,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +44,8 @@ public class MainFragment extends Fragment {
     private TextView wind;
     private TextView humidity;
     private Button aboutCity;
-    private ImageButton citiesSelect;
-    private ImageButton buttonSettings;
+    private MaterialButton citiesSelect;
+    private MaterialButton buttonSettings;
 
     private final String CITY = "city";
     private final String TEMPERATURE = "temperature";
@@ -162,7 +164,7 @@ public class MainFragment extends Fragment {
         WeatherListAdapter weatherListAdapter = new WeatherListAdapter(forecast);
         recyclerView.setAdapter(weatherListAdapter);
 
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         itemDecoration.setDrawable(getActivity().getDrawable(R.drawable.separator));
         recyclerView.addItemDecoration(itemDecoration);
     }

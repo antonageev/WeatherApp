@@ -7,43 +7,46 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".MainActivity"
-    android:background="@drawable/cloudy_back">
+    android:background="@drawable/cloudy_back"
+    android:theme="@style/blindTheme">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/citiesSelect"
-            android:layout_width="48dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/select_city"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/select_city"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/hamburger_icon"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/city"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="32dp"
             android:layout_marginTop="8dp"
             android:text="@string/cityName"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBaseline_toBaselineOf="@id/citiesSelect"/>
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSettings"
-            android:layout_width="48dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/settings"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/settings"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/gear_icon" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/temperature"
@@ -111,11 +114,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/temperature" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/aboutCity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_city"
+            android:layout_marginEnd="8dp"
+            android:textSize="18sp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:icon="@drawable/outline_info_black_24dp"
             app:layout_constraintBottom_toBottomOf="@+id/humidity"
             app:layout_constraintEnd_toEndOf="parent" />
 
