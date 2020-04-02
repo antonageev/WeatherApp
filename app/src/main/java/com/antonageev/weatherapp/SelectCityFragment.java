@@ -2,7 +2,6 @@ package com.antonageev.weatherapp;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,11 +16,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
+
 
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -83,13 +79,6 @@ public class SelectCityFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mDualPane = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
-//        if (savedInstanceState != null){
-//            currentParcel = (Parcel) savedInstanceState.getSerializable("currentCity");
-//            currentPosition = Integer.parseInt(currentParcel.getMapData().get("index"));
-//            Log.d(TAG , "onActivityCreated - parcel was taken from savedInstanceState");
-//        }
-//        else {
-//            currentParcel = new Parcel(citiesWeatherList.get(0));
         if (getFragmentManager().findFragmentById(R.id.mainFragment) != null) {
             MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
             currentPosition = mainFragment.getLocalIndex();
@@ -98,7 +87,6 @@ public class SelectCityFragment extends Fragment {
             currentPosition = 0;
             Log.d(TAG, "onActivityCreated - currentPosition was initialized to 0 due to mainFragment == NULL");
         }
-//        }
         initRecyclerView();
 
         if (mDualPane){
