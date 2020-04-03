@@ -7,8 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".MainActivity"
-    android:background="@drawable/cloudy_back"
-    android:theme="@style/blindTheme">
+    android:background="@drawable/cloudy_back">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

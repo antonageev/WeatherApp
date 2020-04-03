@@ -67,4 +67,14 @@
         <item>16 C</item>
         <item>8 C</item>
     </string-array>
+    <string-array name="windDirection">
+        <item>NE</item>
+        <item>E</item>
+        <item>SE</item>
+        <item>S</item>
+        <item>SW</item>
+        <item>W</item>
+        <item>NW</item>
+        <item>N</item>
+    </string-array>
 </resources>

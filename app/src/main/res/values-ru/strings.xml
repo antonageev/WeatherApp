@@ -67,4 +67,14 @@
         <item>-2 C</item>
         <item>-2 C</item>
     </string-array>
+    <string-array name="windDirection">
+        <item>СВ</item>
+        <item>В</item>
+        <item>ЮВ</item>
+        <item>Ю</item>
+        <item>ЮЗ</item>
+        <item>З</item>
+        <item>СЗ</item>
+        <item>С</item>
+    </string-array>
 </resources>
