@@ -18,9 +18,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.antonageev.weatherapp.observer.Observer;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements Observer {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -57,22 +57,10 @@ public class MainFragment extends Fragment {
 
     private String cityUrl;
 
-    private Parcel parcel = null;
+    private Parcel localParcel = null;
     private int index = 0;
 
     private List<Map<String, String>> forecast = new ArrayList<>();
-
-    static MainFragment create(Parcel parcel){
-        MainFragment mainFragment = new MainFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(PARCEL, parcel);
-        mainFragment.setArguments(args);
-        return mainFragment;
-    }
-
-    private Parcel getParcelFromArguments() throws NullPointerException{
-        return (Parcel) getArguments().getSerializable(PARCEL);
-    }
 
     int getLocalIndex(){
         return index;
@@ -86,44 +74,35 @@ public class MainFragment extends Fragment {
     }
 
     private void getOrInitParcel(Bundle savedInstanceState) {
-        Log.wtf(TAG, "getOrInit: Parcel: " + parcel);
+        Log.wtf(TAG, "getOrInit: Parcel: " + localParcel);
         Log.wtf(TAG, "getOrInit: savedInstState: " + savedInstanceState);
-        if (parcel == null && savedInstanceState != null){
+        if (localParcel == null && savedInstanceState != null){
             try {
-                parcel = (Parcel) savedInstanceState.getSerializable(PARCEL);
-                index = Integer.parseInt(parcel.getMapData().get("index"));
-                Log.w(TAG, "parcel savedInstance: " + parcel);
+                localParcel = (Parcel) savedInstanceState.getSerializable(PARCEL);
+                index = Integer.parseInt(localParcel.getMapData().get("index"));
+                Log.w(TAG, "parcel savedInstance: " + localParcel);
                 Log.w(TAG, "savedInstance: " + savedInstanceState);
             } catch (NullPointerException e){
                 Log.w(TAG , " Перехват NullPointerException при запуске MainActivity из-за отсутствия savedInstanceState");
             }
         }
-        if (parcel == null){
-            try {
-                parcel = getParcelFromArguments();
-                index = Integer.parseInt(parcel.getMapData().get("index"));
-                Log.w(TAG, "parcel from getParcelFromArguments: " + parcel);
-            } catch (NullPointerException e){
-                Log.w(TAG , "Перехват NullPointerException при запуске MainActivity из-за отсутствия parcel");
-            }
-        }
 
-        if (parcel == null){
+        if (localParcel == null){
             try {
-                parcel = (Parcel) getActivity().getIntent().getSerializableExtra(PARCEL);
-                index = Integer.parseInt(parcel.getMapData().get("index"));
-                Log.w(TAG , "parcel getIntent: " + parcel);
-                Log.w(TAG , "parcel from getIntent, getCity: " + parcel.getMapData().get(CITY));
+                localParcel = (Parcel) getActivity().getIntent().getSerializableExtra(PARCEL);
+                index = Integer.parseInt(localParcel.getMapData().get("index"));
+                Log.w(TAG , "parcel getIntent: " + localParcel);
+                Log.w(TAG , "parcel from getIntent, getCity: " + localParcel.getMapData().get(CITY));
             } catch (NullPointerException e){
                 Log.w(TAG, " Перехват NullPointerException при запуске MainActivity из-за отсутствия Intent");
             }
         }
 
-        if (parcel == null){
+        if (localParcel == null){
             try {
-                parcel = new Parcel(createInitialMapData());
-                index = Integer.parseInt(parcel.getMapData().get("index"));;
-                Log.w(TAG , "parcel created: " + parcel);
+                localParcel = new Parcel(createInitialMapData());
+                index = Integer.parseInt(localParcel.getMapData().get("index"));;
+                Log.w(TAG , "parcel created: " + localParcel);
             } catch (NullPointerException e){
                 Log.w(TAG, " Перехват NullPointerException при запуске MainActivity из-за проблем создания parcel");
             }
@@ -137,17 +116,11 @@ public class MainFragment extends Fragment {
         initViews(view);
         setButtonListeners();
         getOrInitParcel(savedInstanceState);
-        Log.wtf(TAG, "parcel object: " + parcel);
-        Log.wtf(TAG , "parcel state CITY: " + parcel.getMapData().get(CITY));
+        Log.wtf(TAG, "parcel object: " + localParcel);
+        Log.wtf(TAG , "parcel state CITY: " + localParcel.getMapData().get(CITY));
         Log.wtf(TAG, "index state: " + index);
 
-        city.setText(parcel.getMapData().get(CITY));
-        weatherDescription.setText(parcel.getMapData().get(WEATHER));
-        temperature.setText(parcel.getMapData().get(TEMPERATURE));
-        wcf.setText(parcel.getMapData().get(WIND_CHILL_FACTOR));
-        humidity.setText(parcel.getMapData().get(HUMIDITY));
-        wind.setText(parcel.getMapData().get(WIND));
-        cityUrl = parcel.getMapData().get(CITY_URL);
+        setTextViesFromParcel(localParcel);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             citiesSelect.setVisibility(View.INVISIBLE);
@@ -155,6 +128,16 @@ public class MainFragment extends Fragment {
 
         forecast = initForecast();
         initRecyclerView(view);
+    }
+
+    private void setTextViesFromParcel(Parcel parcel) {
+        city.setText(parcel.getMapData().get(CITY));
+        weatherDescription.setText(parcel.getMapData().get(WEATHER));
+        temperature.setText(parcel.getMapData().get(TEMPERATURE));
+        wcf.setText(parcel.getMapData().get(WIND_CHILL_FACTOR));
+        humidity.setText(parcel.getMapData().get(HUMIDITY));
+        wind.setText(parcel.getMapData().get(WIND));
+        cityUrl = parcel.getMapData().get(CITY_URL);
     }
 
     private void initRecyclerView(@NonNull View view) {
@@ -171,9 +154,9 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(PARCEL, parcel);
+        outState.putSerializable(PARCEL, localParcel);
         Log.d(TAG, "onSaveInstanceState -outState: " + outState);
-        Log.d(TAG, "onSaveInstanceState -outState, parcel.getCity(): " + parcel.getMapData().get(CITY));
+        Log.d(TAG, "onSaveInstanceState -outState, parcel.getCity(): " + localParcel.getMapData().get(CITY));
         super.onSaveInstanceState(outState);
     }
 
@@ -277,5 +260,11 @@ public class MainFragment extends Fragment {
         list.add(map);
 
         return list;
+    }
+
+    @Override
+    public void updateFields(Parcel parcel) {
+        localParcel = parcel;
+        setTextViesFromParcel(parcel);
     }
 }

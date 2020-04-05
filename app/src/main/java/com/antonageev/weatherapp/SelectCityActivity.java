@@ -12,13 +12,11 @@ public class SelectCityActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_city);
-
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             finish();
             return;
         }
-
+        setContentView(R.layout.activity_select_city);
         Toast.makeText(this, "SelectAct onCreate()", Toast.LENGTH_SHORT).show();
     }
 

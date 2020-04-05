@@ -1,5 +1,6 @@
 package com.antonageev.weatherapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 
 
 import com.antonageev.weatherapp.model.WeatherRequest;
+import com.antonageev.weatherapp.observer.Publisher;
+import com.antonageev.weatherapp.observer.PublisherGetter;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -49,8 +51,9 @@ public class SelectCityFragment extends Fragment {
     private MaterialButton findButton;
     private TextInputEditText editTextCity;
     private List<Map<String, String>> citiesWeatherList;
-    private int currentPosition;
     private RecyclerView recyclerView;
+
+    private Publisher publisher;
 
     private JSONObject weatherJSONdata;
 
@@ -65,9 +68,16 @@ public class SelectCityFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            publisher = ((PublisherGetter) context).getPublisher();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_select_city, container, false);
     }
 
@@ -82,8 +92,6 @@ public class SelectCityFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-//        outState.putSerializable("currentCity", currentParcel);
-//        outState.putInt("currentPosition", currentPosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -91,15 +99,6 @@ public class SelectCityFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mDualPane = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
-
-        if (getFragmentManager().findFragmentById(R.id.mainFragment) != null) {
-            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
-            currentPosition = mainFragment.getLocalIndex();
-            Log.d(TAG, "onActivityCreated - currentPosition was got from mainFragment.getLocalIndex()");
-        } else {
-            currentPosition = 0;
-            Log.d(TAG, "onActivityCreated - currentPosition was initialized to 0 due to mainFragment == NULL");
-        }
 
         initRecyclerView();
 
@@ -119,7 +118,6 @@ public class SelectCityFragment extends Fragment {
                         setAction(getResources().getString(R.string.confirm), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                currentPosition = position;
                                 currentParcel = new Parcel(citiesWeatherList.get(position));
                                 showMainFragment(currentParcel);
                             }
@@ -137,16 +135,7 @@ public class SelectCityFragment extends Fragment {
         Log.wtf(TAG, "showMainFragment - mDualPane: " + mDualPane);
         if (mDualPane) {
             Log.wtf(TAG , "mainFragment: " + getFragmentManager().findFragmentById(R.id.mainFragment));
-            MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
-            Log.wtf(TAG, "LocalIndex == currentPosition: " + (mainFragment.getLocalIndex() == currentPosition));
-
-//            if ( mainFragment.getLocalIndex() != currentPosition ){
-                mainFragment = MainFragment.create(parcel);
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.mainFragmentLayout, mainFragment);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                ft.commit();
-//            }
+            publisher.notify(parcel);
 
         } else {
             Intent intent = new Intent();
