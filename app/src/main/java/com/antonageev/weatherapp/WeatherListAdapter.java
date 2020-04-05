@@ -15,7 +15,7 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
 
     private List<Map<String, String>> dataSource;
 
-    public WeatherListAdapter(List<Map<String, String>> dataSource) {
+    WeatherListAdapter(List<Map<String, String>> dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -38,27 +38,27 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
         return dataSource == null ? 0 : dataSource.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder{
         private TextView textViewDay;
         private TextView textViewWeather;
         private TextView textViewMaxTemperature;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDay = itemView.findViewById(R.id.day);
             textViewWeather = itemView.findViewById(R.id.weather);
             textViewMaxTemperature = itemView.findViewById(R.id.maxTemperature);
         }
 
-        public TextView getTextViewDay() {
+        TextView getTextViewDay() {
             return textViewDay;
         }
 
-        public TextView getTextViewWeather() {
+        TextView getTextViewWeather() {
             return textViewWeather;
         }
 
-        public TextView getTextViewMaxTemperature() {
+        TextView getTextViewMaxTemperature() {
             return textViewMaxTemperature;
         }
     }

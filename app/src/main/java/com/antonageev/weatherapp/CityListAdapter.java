@@ -16,7 +16,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
     private List<Map<String, String>> dataSource;
     private OnItemClickListener onItemClickListener;
 
-    public CityListAdapter(List<Map<String, String>> dataSource) {
+    CityListAdapter(List<Map<String, String>> dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -43,16 +43,16 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
         void onItemClick(View view, int position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
         private TextView city;
         private TextView weather;
         private TextView temperature;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             city = itemView.findViewById(R.id.text_view_city);
             weather = itemView.findViewById(R.id.text_view_weather);
@@ -69,15 +69,15 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
 
         }
 
-        public TextView getCity() {
+        TextView getCity() {
             return city;
         }
 
-        public TextView getWeather() {
+        TextView getWeather() {
             return weather;
         }
 
-        public TextView getTemperature() {
+        TextView getTemperature() {
             return temperature;
         }
 

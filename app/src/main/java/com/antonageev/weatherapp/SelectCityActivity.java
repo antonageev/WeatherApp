@@ -2,6 +2,8 @@ package com.antonageev.weatherapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -11,6 +13,12 @@ public class SelectCityActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_city);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            finish();
+            return;
+        }
+
         Toast.makeText(this, "SelectAct onCreate()", Toast.LENGTH_SHORT).show();
     }
 

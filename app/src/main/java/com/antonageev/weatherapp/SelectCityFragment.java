@@ -17,8 +17,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 
 import com.antonageev.weatherapp.model.WeatherRequest;
@@ -28,21 +26,14 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.net.ssl.HttpsURLConnection;
+import java.util.Objects;
 
 import static com.antonageev.weatherapp.MainFragment.PARCEL;
 /**
@@ -51,10 +42,7 @@ import static com.antonageev.weatherapp.MainFragment.PARCEL;
 public class SelectCityFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
-
-    private final String API_KEY = "639a7024d266b4113f5eb00f0a3fe1f0";
-    private final String UNITS = "metric";
-    private String requestedCities;
+    private final Handler handler = new Handler();
 
     Parcel currentParcel;
     private MaterialButton backButton;
@@ -63,6 +51,8 @@ public class SelectCityFragment extends Fragment {
     private List<Map<String, String>> citiesWeatherList;
     private int currentPosition;
     private RecyclerView recyclerView;
+
+    private JSONObject weatherJSONdata;
 
     private boolean mDualPane;
 
@@ -84,7 +74,7 @@ public class SelectCityFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        citiesWeatherList = initHardCodedCitiesList();
+        citiesWeatherList = initCitiesList();
         initViews(view);
         setListeners();
 
@@ -110,6 +100,7 @@ public class SelectCityFragment extends Fragment {
             currentPosition = 0;
             Log.d(TAG, "onActivityCreated - currentPosition was initialized to 0 due to mainFragment == NULL");
         }
+
         initRecyclerView();
 
         if (mDualPane){
@@ -138,10 +129,8 @@ public class SelectCityFragment extends Fragment {
         recyclerView.setAdapter(cityListAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        dividerItemDecoration.setDrawable(getActivity().getDrawable(R.drawable.separator));
+        dividerItemDecoration.setDrawable(Objects.requireNonNull(getActivity().getDrawable(R.drawable.separator)));
         recyclerView.addItemDecoration(dividerItemDecoration);
-
-
     }
 
     private void showMainFragment(Parcel parcel) {
@@ -151,13 +140,13 @@ public class SelectCityFragment extends Fragment {
             MainFragment mainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.mainFragment);
             Log.wtf(TAG, "LocalIndex == currentPosition: " + (mainFragment.getLocalIndex() == currentPosition));
 
-            if ( mainFragment.getLocalIndex() != currentPosition ){
+//            if ( mainFragment.getLocalIndex() != currentPosition ){
                 mainFragment = MainFragment.create(parcel);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.mainFragmentLayout, mainFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 ft.commit();
-            }
+//            }
 
         } else {
             Intent intent = new Intent();
@@ -184,89 +173,52 @@ public class SelectCityFragment extends Fragment {
         findButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String requestedCity = editTextCity.getText().toString();
-                String requestedUrl = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&units=%s&appid=%s",
-                        requestedCity, UNITS, API_KEY);
-                Log.wtf(TAG, requestedUrl);
-                try {
-                    final URL uri = new URL (requestedUrl);
-                    final Handler handler = new Handler();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            HttpsURLConnection urlConnection = null;
-                            try {
-                                urlConnection = (HttpsURLConnection) uri.openConnection();
-                                urlConnection.setRequestMethod("GET");
-                                urlConnection.setReadTimeout(10000);
-                                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                                String result = getLines(in);
-                                Log.wtf(TAG, result);
-                                Gson gson = new Gson();
-                                final WeatherRequest weatherRequest = gson.fromJson(result, WeatherRequest.class);
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        displayWeather(weatherRequest);
-                                    }
-                                });
-                            } catch (IOException e){
-                             e.printStackTrace();
-                             handler.post(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                     Snackbar.make(getView(),"City "+ requestedCity + " not found", BaseTransientBottomBar.LENGTH_SHORT).show();
-                                     editTextCity.requestFocus();
-                                 }
-                             });
-                             Log.e(TAG, "Connection failed");
-                            }
-                        }
-                    }).start();
-                } catch (MalformedURLException e){
-                    e.printStackTrace();
-                }
+                updateWeatherData(editTextCity.getText().toString());
             }
         });
     }
 
-    private String getLines(BufferedReader reader){
-        StringBuilder stringBuilder = new StringBuilder();
-        String tempString;
-        try {
-            while (true){
-                tempString = reader.readLine();
-                if (tempString == null) break;
-                stringBuilder.append(tempString).append("\n");
+    private void updateWeatherData(final String city) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                weatherJSONdata = WeatherDataLoader.getJSONdata(city);
+                if (weatherJSONdata != null){
+                    Gson gson = new Gson();
+                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showMainFragment(new Parcel(renderWeather(weatherRequest)));
+                        }
+                    });
+                } else {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Snackbar.make(getView(),"City "+ city + " not found", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            editTextCity.requestFocus();
+                        }
+                    });
+                    Log.e(TAG, "Connection failed");
+                }
             }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-        try {
-            if (reader != null){
-                reader.close();
-            }
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        return stringBuilder.toString();
+        }).start();
     }
 
-    private void displayWeather(WeatherRequest weatherRequest){
+    private Map<String, String> renderWeather(WeatherRequest weatherRequest){
         Map<String, String> localMap = new HashMap<>();
         localMap.put("index", "0");
         localMap.put("city", weatherRequest.getName());
         localMap.put("weather", weatherRequest.getWeather()[0].getMain());
-        localMap.put("temperature", String.format("%.0f", weatherRequest.getMain().getTemp()));
-        localMap.put("wcf",  String.format("%.0f",weatherRequest.getMain().getFeels_like()));
+        localMap.put("temperature", String.format(Locale.getDefault(), "%.0f", weatherRequest.getMain().getTemp()) + " \u2103");
+        localMap.put("wcf",  String.format(Locale.getDefault(),"%.0f",weatherRequest.getMain().getFeels_like()) + " \u2103");
         localMap.put("humidity", "Humidity: " + weatherRequest.getMain().getHumidity()+"%");
         localMap.put("wind", String.format("Wind: %s, %s m/s", assignWindDirection(weatherRequest.getWind().getDeg()),
-                String.format("%.1f",weatherRequest.getWind().getSpeed())));
+                String.format(Locale.getDefault(),"%.1f",weatherRequest.getWind().getSpeed())));
         localMap.put("cityUrl", getResources().getString(R.string.urlMoscow));
 
-        showMainFragment(new Parcel(localMap));
+        return localMap;
     }
 
     private String assignWindDirection(int degrees){
@@ -282,7 +234,7 @@ public class SelectCityFragment extends Fragment {
     }
 
 
-    private List<Map<String, String>> initHardCodedCitiesList() {
+    private List<Map<String, String>> initCitiesList() {
         List<Map<String, String>> citiesList = new ArrayList<>();
 
         Map<String, String> map = new HashMap<>();
