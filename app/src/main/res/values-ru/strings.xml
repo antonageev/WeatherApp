@@ -33,7 +33,6 @@
     <string name="settingsTemperature">Temperature</string>
     <string name="settingsTextCelsius">Цельсий</string>
     <string name="settingsTextFahrenheit">Фаренгейт</string>
-    <string name="select_city">Выбрать город</string>
     <string name="about_city">О городе</string>
     <string name="urlNewYork">https://ru.wikipedia.org/wiki/Нью-Йорк</string>
     <string name="urlTokyo">https://ru.wikipedia.org/wiki/Токио</string>

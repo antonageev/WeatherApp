@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp.model;
+package com.antonageev.weatherapp.model_current;
 
 public class Weather {
     private int id;

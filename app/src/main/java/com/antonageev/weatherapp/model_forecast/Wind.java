@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp.model;
+package com.antonageev.weatherapp.model_forecast;
 
 public class Wind {
     private float speed;

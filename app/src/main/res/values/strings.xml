@@ -33,7 +33,6 @@
     <string name="settingsTemperature">Temperature</string>
     <string name="settingsTextCelsius">Cels</string>
     <string name="settingsTextFahrenheit">Fh</string>
-    <string name="select_city">Cities</string>
     <string name="about_city">About City</string>
     <string name="urlNewYork">https://en.wikipedia.org/wiki/New_York_City</string>
     <string name="urlTokyo">https://en.wikipedia.org/wiki/Tokyo</string>

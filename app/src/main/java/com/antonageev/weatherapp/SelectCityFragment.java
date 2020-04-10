@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import com.antonageev.weatherapp.model.WeatherRequest;
+import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.observer.Publisher;
 import com.antonageev.weatherapp.observer.PublisherGetter;
 import com.google.android.material.button.MaterialButton;
