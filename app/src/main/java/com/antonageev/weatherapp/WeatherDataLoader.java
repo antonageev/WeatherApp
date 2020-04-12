@@ -12,12 +12,12 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-class WeatherDataLoader {
+public class WeatherDataLoader {
 
     private static final String API_KEY = "639a7024d266b4113f5eb00f0a3fe1f0";
     private static final String UNITS_METRIC = "metric";
 
-    static JSONObject getJSONdata(String city) {
+    public static JSONObject getJSONdata(String city) {
         String requestedUrl = String.format("https://api.openweathermap.org/data/2.5/weather?q=%s&units=%s&appid=%s",
                 city, UNITS_METRIC, API_KEY);
         JSONObject jsonObject;

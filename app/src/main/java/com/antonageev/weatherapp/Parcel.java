@@ -6,11 +6,11 @@ import java.util.Map;
 public class Parcel implements Serializable {
     private Map<String, String> mapData;
 
-    Parcel(Map<String, String> data){
+    public Parcel(Map<String, String> data){
         this.mapData = data;
     }
 
-    Map<String, String> getMapData() {
+    public Map<String, String> getMapData() {
         return mapData;
     }
 }

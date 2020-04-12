@@ -15,7 +15,7 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
 
     private List<Map<String, String>> dataSource;
 
-    WeatherListAdapter(List<Map<String, String>> dataSource) {
+    public WeatherListAdapter(List<Map<String, String>> dataSource) {
         this.dataSource = dataSource;
     }
 

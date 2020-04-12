@@ -1,13 +1,14 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.ui.cities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,8 +18,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
+import com.antonageev.weatherapp.CityListAdapter;
+import com.antonageev.weatherapp.Parcel;
+import com.antonageev.weatherapp.R;
+import com.antonageev.weatherapp.SharedViewModel;
+import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.observer.Publisher;
 import com.antonageev.weatherapp.observer.PublisherGetter;
@@ -37,12 +44,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.antonageev.weatherapp.MainFragment.PARCEL;
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SelectCityFragment extends Fragment {
 
+    private static final String PARCEL = "parcel";
     private final String TAG = this.getClass().getSimpleName();
     private final Handler handler = new Handler();
 
@@ -50,14 +57,18 @@ public class SelectCityFragment extends Fragment {
     private MaterialButton backButton;
     private MaterialButton findButton;
     private TextInputEditText editTextCity;
-    private List<Map<String, String>> citiesWeatherList;
+    private CitiesWeatherList citiesWeatherList;
     private RecyclerView recyclerView;
+
+    private CityListAdapter cityListAdapter;
 
     private Publisher publisher;
 
     private JSONObject weatherJSONdata;
 
     private boolean mDualPane;
+
+    SharedViewModel sharedViewModel;
 
     public static SelectCityFragment create(int index){
         SelectCityFragment selectCityFragment = new SelectCityFragment();
@@ -70,9 +81,6 @@ public class SelectCityFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            publisher = ((PublisherGetter) context).getPublisher();
-        }
     }
 
     @Override
@@ -84,15 +92,27 @@ public class SelectCityFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        citiesWeatherList = initCitiesList();
+
+        if (sharedViewModel == null) {
+            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        }
+        citiesWeatherList = sharedViewModel.getStoredCitiesWeatherList().getValue();
+        if (citiesWeatherList == null){
+            citiesWeatherList = new CitiesWeatherList(initCitiesList());
+        }
         initViews(view);
         setListeners();
 
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onStop() {
+        super.onStop();
+        if (sharedViewModel == null){
+            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        }
+        sharedViewModel.saveCitiesWeatherList(citiesWeatherList);
+        Toast.makeText(getActivity(), "Select City Fragment On STOP", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -108,9 +128,10 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        CityListAdapter cityListAdapter = new CityListAdapter(citiesWeatherList);
+        cityListAdapter = new CityListAdapter(citiesWeatherList.getList());
         LinearLayoutManager lt = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(lt);
+        recyclerView.setAdapter(cityListAdapter);
         cityListAdapter.setOnItemClickListener(new CityListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, final int position) {
@@ -118,13 +139,12 @@ public class SelectCityFragment extends Fragment {
                         setAction(getResources().getString(R.string.confirm), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                currentParcel = new Parcel(citiesWeatherList.get(position));
+                                currentParcel = new Parcel(cityListAdapter.getDataSource().get(position));
                                 showMainFragment(currentParcel);
                             }
                         }).show();
             }
         });
-        recyclerView.setAdapter(cityListAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         dividerItemDecoration.setDrawable(Objects.requireNonNull(getActivity().getDrawable(R.drawable.separator)));
@@ -132,17 +152,11 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void showMainFragment(Parcel parcel) {
-        Log.wtf(TAG, "showMainFragment - mDualPane: " + mDualPane);
-        if (mDualPane) {
-            Log.wtf(TAG , "mainFragment: " + getFragmentManager().findFragmentById(R.id.mainFragment));
-            publisher.notify(parcel);
-
-        } else {
-            Intent intent = new Intent();
-            intent.setClass(getActivity(), MainActivity.class);
-            intent.putExtra(PARCEL, parcel);
-            startActivity(intent);
+        if (sharedViewModel == null){
+            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         }
+        sharedViewModel.saveParcel(parcel);
+        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(R.id.nav_home);
     }
 
     private void initViews(View view){
@@ -153,12 +167,6 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void setListeners(){
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().finish();
-            }
-        });
         findButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,7 +186,11 @@ public class SelectCityFragment extends Fragment {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            showMainFragment(new Parcel(renderWeather(weatherRequest)));
+                            if (citiesWeatherList.isCityInList(city)){
+                                Snackbar.make(getView(),"City "+ city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                cityListAdapter.addItem(renderWeather(weatherRequest));
+                            }
                         }
                     });
                 } else {

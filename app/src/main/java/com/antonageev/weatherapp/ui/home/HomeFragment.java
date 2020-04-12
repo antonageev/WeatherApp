@@ -1,7 +1,6 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.ui.home;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.antonageev.weatherapp.Parcel;
+import com.antonageev.weatherapp.R;
+import com.antonageev.weatherapp.SettingsActivity;
+import com.antonageev.weatherapp.SharedViewModel;
+import com.antonageev.weatherapp.WeatherListAdapter;
 import com.antonageev.weatherapp.observer.Observer;
 import com.google.android.material.button.MaterialButton;
 
@@ -31,7 +37,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MainFragment extends Fragment implements Observer {
+public class HomeFragment extends Fragment implements Observer {
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -62,9 +68,11 @@ public class MainFragment extends Fragment implements Observer {
 
     private List<Map<String, String>> forecast = new ArrayList<>();
 
-    int getLocalIndex(){
-        return index;
+    public HomeFragment(Parcel parcel){
+        this.localParcel = parcel;
     }
+
+    public HomeFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,6 +82,11 @@ public class MainFragment extends Fragment implements Observer {
     }
 
     private void getOrInitParcel(Bundle savedInstanceState) {
+
+        SharedViewModel model = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        Log.wtf(TAG, "SharedViewModel: " + model.getSavedParcel().getValue());
+        localParcel = model.getSavedParcel().getValue();
+
         Log.wtf(TAG, "getOrInit: Parcel: " + localParcel);
         Log.wtf(TAG, "getOrInit: savedInstState: " + savedInstanceState);
         if (localParcel == null && savedInstanceState != null){
@@ -89,19 +102,8 @@ public class MainFragment extends Fragment implements Observer {
 
         if (localParcel == null){
             try {
-                localParcel = (Parcel) getActivity().getIntent().getSerializableExtra(PARCEL);
-                index = Integer.parseInt(localParcel.getMapData().get("index"));
-                Log.w(TAG , "parcel getIntent: " + localParcel);
-                Log.w(TAG , "parcel from getIntent, getCity: " + localParcel.getMapData().get(CITY));
-            } catch (NullPointerException e){
-                Log.w(TAG, " Перехват NullPointerException при запуске MainActivity из-за отсутствия Intent");
-            }
-        }
-
-        if (localParcel == null){
-            try {
                 localParcel = new Parcel(createInitialMapData());
-                index = Integer.parseInt(localParcel.getMapData().get("index"));;
+                index = Integer.parseInt(localParcel.getMapData().get("index"));
                 Log.w(TAG , "parcel created: " + localParcel);
             } catch (NullPointerException e){
                 Log.w(TAG, " Перехват NullPointerException при запуске MainActivity из-за проблем создания parcel");
@@ -112,7 +114,7 @@ public class MainFragment extends Fragment implements Observer {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.wtf(TAG , "Main: mainFragment" + getFragmentManager().findFragmentById(R.id.mainFragment));
+//        Log.wtf(TAG , "Main: mainFragment" + getParentFragmentManager().findFragmentById(R.id.mainFragment));
         initViews(view);
         setButtonListeners();
         getOrInitParcel(savedInstanceState);
@@ -122,9 +124,9 @@ public class MainFragment extends Fragment implements Observer {
 
         setTextViesFromParcel(localParcel);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             citiesSelect.setVisibility(View.INVISIBLE);
-        }
+//        }
 
         forecast = initForecast();
         initRecyclerView(view);
@@ -154,10 +156,10 @@ public class MainFragment extends Fragment implements Observer {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable(PARCEL, localParcel);
-        Log.d(TAG, "onSaveInstanceState -outState: " + outState);
-        Log.d(TAG, "onSaveInstanceState -outState, parcel.getCity(): " + localParcel.getMapData().get(CITY));
         super.onSaveInstanceState(outState);
+        outState.putSerializable(PARCEL, localParcel);
+//        Log.d(TAG, "onSaveInstanceState -outState: " + outState);
+//        Log.d(TAG, "onSaveInstanceState -outState, parcel.getCity(): " + localParcel.getMapData().get(CITY));
     }
 
     private void initViews(View view){
@@ -178,13 +180,6 @@ public class MainFragment extends Fragment implements Observer {
             public void onClick(View v) {
                 Intent intentToSettings = new Intent(getContext(), SettingsActivity.class);
                 startActivity(intentToSettings);
-            }
-        });
-        citiesSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentToCitiesSelect = new Intent(getContext(), SelectCityActivity.class);
-                startActivity(intentToCitiesSelect);
             }
         });
         aboutCity.setOnClickListener(new View.OnClickListener() {
@@ -266,5 +261,17 @@ public class MainFragment extends Fragment implements Observer {
     public void updateFields(Parcel parcel) {
         localParcel = parcel;
         setTextViesFromParcel(parcel);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Toast.makeText(getContext(), "HOME Fragment onPause()", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Toast.makeText(getContext(), "HOME Fragment onStop()", Toast.LENGTH_SHORT).show();
     }
 }

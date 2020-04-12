@@ -16,8 +16,17 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
     private List<Map<String, String>> dataSource;
     private OnItemClickListener onItemClickListener;
 
-    CityListAdapter(List<Map<String, String>> dataSource) {
+    public CityListAdapter(List<Map<String, String>> dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void addItem(Map<String, String> elem){
+        dataSource.add(0, elem);
+        notifyItemInserted(0);
+    }
+
+    public List<Map<String, String>> getDataSource(){
+        return dataSource;
     }
 
     @NonNull
@@ -43,7 +52,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
         void onItemClick(View view, int position);
     }
 
-    void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
