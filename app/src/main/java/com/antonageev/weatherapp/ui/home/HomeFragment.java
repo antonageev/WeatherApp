@@ -1,8 +1,5 @@
 package com.antonageev.weatherapp.ui.home;
 
-import android.content.Intent;
-
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,14 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
-import com.antonageev.weatherapp.SettingsActivity;
 import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherListAdapter;
-import com.antonageev.weatherapp.observer.Observer;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -37,7 +31,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements Observer {
+public class HomeFragment extends Fragment{
 
     private final String TAG = this.getClass().getSimpleName();
 
@@ -114,9 +108,7 @@ public class HomeFragment extends Fragment implements Observer {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//        Log.wtf(TAG , "Main: mainFragment" + getParentFragmentManager().findFragmentById(R.id.mainFragment));
         initViews(view);
-        setButtonListeners();
         getOrInitParcel(savedInstanceState);
         Log.wtf(TAG, "parcel object: " + localParcel);
         Log.wtf(TAG , "parcel state CITY: " + localParcel.getMapData().get(CITY));
@@ -124,9 +116,9 @@ public class HomeFragment extends Fragment implements Observer {
 
         setTextViesFromParcel(localParcel);
 
-//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            citiesSelect.setVisibility(View.INVISIBLE);
-//        }
+        citiesSelect.setVisibility(View.INVISIBLE);
+        buttonSettings.setVisibility(View.INVISIBLE);
+        aboutCity.setVisibility(View.INVISIBLE);
 
         forecast = initForecast();
         initRecyclerView(view);
@@ -158,8 +150,6 @@ public class HomeFragment extends Fragment implements Observer {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(PARCEL, localParcel);
-//        Log.d(TAG, "onSaveInstanceState -outState: " + outState);
-//        Log.d(TAG, "onSaveInstanceState -outState, parcel.getCity(): " + localParcel.getMapData().get(CITY));
     }
 
     private void initViews(View view){
@@ -172,24 +162,6 @@ public class HomeFragment extends Fragment implements Observer {
         wind = view.findViewById(R.id.wind);
         humidity = view.findViewById(R.id.humidity);
         aboutCity = view.findViewById(R.id.aboutCity);
-    }
-
-    private void setButtonListeners() {
-        buttonSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentToSettings = new Intent(getContext(), SettingsActivity.class);
-                startActivity(intentToSettings);
-            }
-        });
-        aboutCity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.parse(cityUrl);
-                Intent intentViewCity = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intentViewCity);
-            }
-        });
     }
 
     private Map<String, String> createInitialMapData(){
@@ -255,23 +227,5 @@ public class HomeFragment extends Fragment implements Observer {
         list.add(map);
 
         return list;
-    }
-
-    @Override
-    public void updateFields(Parcel parcel) {
-        localParcel = parcel;
-        setTextViesFromParcel(parcel);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Toast.makeText(getContext(), "HOME Fragment onPause()", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Toast.makeText(getContext(), "HOME Fragment onStop()", Toast.LENGTH_SHORT).show();
     }
 }

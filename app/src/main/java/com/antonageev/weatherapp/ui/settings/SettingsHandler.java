@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.ui.settings;
 
 final class SettingsHandler {
 

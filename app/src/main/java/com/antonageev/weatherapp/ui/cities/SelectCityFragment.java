@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 
 import com.antonageev.weatherapp.CityListAdapter;
@@ -28,7 +27,6 @@ import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.observer.Publisher;
-import com.antonageev.weatherapp.observer.PublisherGetter;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -54,7 +52,6 @@ public class SelectCityFragment extends Fragment {
     private final Handler handler = new Handler();
 
     Parcel currentParcel;
-    private MaterialButton backButton;
     private MaterialButton findButton;
     private TextInputEditText editTextCity;
     private CitiesWeatherList citiesWeatherList;
@@ -112,7 +109,6 @@ public class SelectCityFragment extends Fragment {
             sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         }
         sharedViewModel.saveCitiesWeatherList(citiesWeatherList);
-        Toast.makeText(getActivity(), "Select City Fragment On STOP", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -122,9 +118,6 @@ public class SelectCityFragment extends Fragment {
 
         initRecyclerView();
 
-        if (mDualPane){
-            backButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void initRecyclerView() {
@@ -160,7 +153,6 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void initViews(View view){
-        backButton = view.findViewById(R.id.backButton);
         findButton = view.findViewById(R.id.findButton);
         editTextCity = view.findViewById(R.id.editTextCity);
         recyclerView = view.findViewById(R.id.recyclerView);
