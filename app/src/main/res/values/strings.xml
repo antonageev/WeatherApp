@@ -50,6 +50,13 @@
     <string name="urlMoscow">https://en.wikipedia.org/wiki/Moscow</string>
     <string name="snackBarSure">Are you sure?</string>
     <string name="confirm">confirm</string>
+    <string name="Sorry">Sorry!</string>
+    <string name="cityNotFoundExclamation">Seems to be that city %1$s doesn\'t exist</string>
+    <string name="OKBtn">OK</string>
+    <string name="didn_t_know">Hmm</string>
+    <string name="no">NO</string>
+    <string name="yes">YES</string>
+
     <string-array name="days">
         <item>today</item>
         <item>tomorrow</item>

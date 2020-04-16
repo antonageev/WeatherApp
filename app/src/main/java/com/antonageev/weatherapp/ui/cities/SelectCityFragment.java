@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp.ui.cities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import com.antonageev.weatherapp.CityListAdapter;
@@ -59,7 +62,7 @@ public class SelectCityFragment extends Fragment {
 
     private CityListAdapter cityListAdapter;
 
-    private Publisher publisher;
+    private DialogCustomFragment dlgCustom;
 
     private JSONObject weatherJSONdata;
 
@@ -89,6 +92,8 @@ public class SelectCityFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        dlgCustom = new DialogCustomFragment();
 
         if (sharedViewModel == null) {
             sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -167,6 +172,10 @@ public class SelectCityFragment extends Fragment {
         });
     }
 
+    public void onDialogResult(String resultDialog){
+        Toast.makeText(getActivity(),"selected button: " + resultDialog, Toast.LENGTH_SHORT).show();
+    }
+
     private void updateWeatherData(final String city) {
         new Thread(new Runnable() {
             @Override
@@ -189,7 +198,20 @@ public class SelectCityFragment extends Fragment {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Snackbar.make(getView(),"City "+ city + " not found", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            dlgCustom.show(getParentFragmentManager(), "");
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                            String alertMessage = getResources().getString(R.string.cityNotFoundExclamation, city);
+//                            builder.setTitle(R.string.Sorry)
+//                                    .setMessage(alertMessage)
+//                                    .setCancelable(false)
+//                                    .setPositiveButton(getResources().getString(R.string.OKBtn), new DialogInterface.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(DialogInterface dialog, int which) {
+//                                            Toast.makeText(getActivity(),"we are glad you agree)", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//                            AlertDialog alert = builder.create();
+//                            alert.show();
                             editTextCity.requestFocus();
                         }
                     });
