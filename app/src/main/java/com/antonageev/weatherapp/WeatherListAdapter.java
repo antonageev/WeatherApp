@@ -19,6 +19,11 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
         this.dataSource = dataSource;
     }
 
+    public void weatherListDataChange(List<Map<String, String>> newDataSource){
+        dataSource = newDataSource;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

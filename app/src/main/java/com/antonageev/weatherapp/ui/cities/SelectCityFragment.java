@@ -1,8 +1,6 @@
 package com.antonageev.weatherapp.ui.cities;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -28,13 +26,12 @@ import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
+import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
-import com.antonageev.weatherapp.observer.Publisher;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -64,7 +61,7 @@ public class SelectCityFragment extends Fragment {
 
     private DialogCustomFragment dlgCustom;
 
-    private JSONObject weatherJSONdata;
+    private JSONObject weatherJSONData;
 
     private boolean mDualPane;
 
@@ -180,10 +177,10 @@ public class SelectCityFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                weatherJSONdata = WeatherDataLoader.getJSONdata(city);
-                if (weatherJSONdata != null){
-                    Gson gson = new Gson();
-                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
+                weatherJSONData = WeatherDataLoader.getJSONdata(city, WeatherDataLoader.WEATHER_CURRENT_DATA);
+                if (weatherJSONData != null){
+                    final WeatherRequest weatherRequest = (WeatherRequest) WeatherParser.renderWeatherData(weatherJSONData, WeatherDataLoader.WEATHER_CURRENT_DATA);
+//                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -199,19 +196,6 @@ public class SelectCityFragment extends Fragment {
                         @Override
                         public void run() {
                             dlgCustom.show(getParentFragmentManager(), "");
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                            String alertMessage = getResources().getString(R.string.cityNotFoundExclamation, city);
-//                            builder.setTitle(R.string.Sorry)
-//                                    .setMessage(alertMessage)
-//                                    .setCancelable(false)
-//                                    .setPositiveButton(getResources().getString(R.string.OKBtn), new DialogInterface.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(DialogInterface dialog, int which) {
-//                                            Toast.makeText(getActivity(),"we are glad you agree)", Toast.LENGTH_SHORT).show();
-//                                        }
-//                                    });
-//                            AlertDialog alert = builder.create();
-//                            alert.show();
                             editTextCity.requestFocus();
                         }
                     });

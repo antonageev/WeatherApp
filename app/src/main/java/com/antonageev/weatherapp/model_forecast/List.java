@@ -1,7 +1,9 @@
 package com.antonageev.weatherapp.model_forecast;
 
 
-public class List {
+import java.io.Serializable;
+
+public class List implements Serializable {
     private Main main;
     private Weather[] weather;
     private Wind wind;

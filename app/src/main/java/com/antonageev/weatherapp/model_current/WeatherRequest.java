@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp.model_current;
 
-public class WeatherRequest {
+import com.antonageev.weatherapp.WeatherData;
+
+public class WeatherRequest implements WeatherData {
     private Main main;
     private Weather[] weather;
     private Wind wind;

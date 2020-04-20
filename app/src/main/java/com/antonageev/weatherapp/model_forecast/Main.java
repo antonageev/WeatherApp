@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp.model_forecast;
 
-public class Main {
+import java.io.Serializable;
+
+public class Main implements Serializable {
     private float temp;
     private float feels_like;
     private int humidity;

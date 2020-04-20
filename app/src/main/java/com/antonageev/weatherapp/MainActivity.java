@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity{
 
+    public static final String WEATHER_FORECAST_INTENT_FILTER = "com.antonageev.weatherapp.forecast";
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override

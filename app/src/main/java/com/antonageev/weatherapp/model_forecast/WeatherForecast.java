@@ -1,6 +1,12 @@
 package com.antonageev.weatherapp.model_forecast;
 
-public class WeatherForecast {
+import android.os.Parcelable;
+
+import com.antonageev.weatherapp.WeatherData;
+
+import java.io.Serializable;
+
+public class WeatherForecast implements WeatherData, Serializable {
     private List[] list;
     private City city;
 
