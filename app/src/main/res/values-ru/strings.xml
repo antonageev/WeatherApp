@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_home">Погода</string>
+    <string name="menu_cities">Выбор города</string>
+    <string name="menu_settings">Настройки</string>
+
     <string name="cityName">Москва</string>
     <string name="buttonToday">Сегодня</string>
     <string name="buttonTom">Завтра</string>
@@ -39,6 +50,12 @@
     <string name="urlMoscow">https://ru.wikipedia.org/wiki/Москва</string>
     <string name="snackBarSure">Вы уверены?</string>
     <string name="confirm">ОК</string>
+    <string name="Sorry">Простите, конечно!</string>
+    <string name="cityNotFoundExclamation">Но похоже, что годод %1$s не cуществует</string>
+    <string name="no">Нет</string>
+    <string name="OKBtn">ОК</string>
+    <string name="didn_t_know">Хмм</string>
+    <string name="yes">YES</string>
     <string-array name="days">
         <item>Сегодня</item>
         <item>Завтра</item>

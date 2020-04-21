@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp.model_forecast;
 
-public class City {
+import java.io.Serializable;
+
+public class City implements Serializable {
     private String name;
 
     public String getName() {

@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.ui.settings;
 
 import android.os.Bundle;
 
@@ -9,16 +9,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.Switch;
 
+import com.antonageev.weatherapp.R;
 import com.google.android.material.button.MaterialButton;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SettingsFragment extends Fragment {
 
     private MaterialButton backButton;
@@ -44,6 +40,8 @@ public class SettingsFragment extends Fragment {
         initViews(view);
         setListeners();
 
+        backButton.setVisibility(View.INVISIBLE);
+
         switchDarkTheme.setChecked(settingsHandler.isDarkTheme());
         setTextToSwitcher();
         windMetersPerSecond.setChecked(settingsHandler.isMetersPerSecondChecked());
@@ -62,16 +60,6 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setListeners(){
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    getActivity().finish();
-                } catch (NullPointerException e){
-                    e.printStackTrace();
-                }
-            }
-        });
         switchDarkTheme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
