@@ -52,10 +52,16 @@
     <string name="confirm">ОК</string>
     <string name="Sorry">Простите, конечно!</string>
     <string name="cityNotFoundExclamation">Но похоже, что годод %1$s не cуществует</string>
+    <string name="cityForecastDownloadFailed">Не могу загрузить данные для города %1$s</string>
     <string name="no">Нет</string>
     <string name="OKBtn">ОК</string>
     <string name="didn_t_know">Хмм</string>
     <string name="yes">YES</string>
+
+    <string-array name="linksToWeatherPictures">
+        <item></item>
+    </string-array>
+
     <string-array name="days">
         <item>Сегодня</item>
         <item>Завтра</item>

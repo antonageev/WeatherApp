@@ -1,11 +1,28 @@
 package com.antonageev.weatherapp.model_current;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Main {
+    @SerializedName("temp")
+    @Expose
     private float temp;
-    private float feels_like;
+
+    @SerializedName("feels_like")
+    @Expose
+    private float feelsLike;
+
+    @SerializedName("humidity")
+    @Expose
     private int humidity;
-    private float temp_min;
-    private float temp_max;
+
+    @SerializedName("temp_min")
+    @Expose
+    private float tempMin;
+
+    @SerializedName("temp_max")
+    @Expose
+    private float tempMax;
 
     public float getTemp() {
         return temp;
@@ -15,12 +32,12 @@ public class Main {
         this.temp = temp;
     }
 
-    public float getFeels_like() {
-        return feels_like;
+    public float getFeelsLike() {
+        return feelsLike;
     }
 
-    public void setFeels_like(float feels_like) {
-        this.feels_like = feels_like;
+    public void setFeelsLike(float feelsLike) {
+        this.feelsLike = feelsLike;
     }
 
     public int getHumidity() {
@@ -31,19 +48,19 @@ public class Main {
         this.humidity = humidity;
     }
 
-    public float getTemp_min() {
-        return temp_min;
+    public float getTempMin() {
+        return tempMin;
     }
 
-    public  void setTemp_min(float temp_min) {
-        this.temp_min = temp_min;
+    public  void setTempMin(float tempMin) {
+        this.tempMin = tempMin;
     }
 
-    public float getTemp_max() {
-        return temp_max;
+    public float getTempMax() {
+        return tempMax;
     }
 
-    public void setTemp_max(float temp_max) {
-        this.temp_max = temp_max;
+    public void setTempMax(float tempMax) {
+        this.tempMax = tempMax;
     }
 }

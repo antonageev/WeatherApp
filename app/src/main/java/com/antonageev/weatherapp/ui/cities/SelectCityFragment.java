@@ -22,9 +22,11 @@ import android.widget.Toast;
 
 
 import com.antonageev.weatherapp.CityListAdapter;
+import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
+import com.antonageev.weatherapp.WeatherData;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
@@ -40,7 +42,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,6 +65,8 @@ public class SelectCityFragment extends Fragment {
     private RecyclerView recyclerView;
 
     private CityListAdapter cityListAdapter;
+
+    private WeatherData resultData;
 
     private DialogCustomFragment dlgCustom;
 
@@ -97,7 +106,7 @@ public class SelectCityFragment extends Fragment {
         }
         citiesWeatherList = sharedViewModel.getStoredCitiesWeatherList().getValue();
         if (citiesWeatherList == null){
-            citiesWeatherList = new CitiesWeatherList(initCitiesList());
+            citiesWeatherList = new CitiesWeatherList(new ArrayList<Map<String, String>>());
         }
         initViews(view);
         setListeners();
@@ -142,7 +151,7 @@ public class SelectCityFragment extends Fragment {
         });
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        dividerItemDecoration.setDrawable(Objects.requireNonNull(getActivity().getDrawable(R.drawable.separator)));
+        dividerItemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
@@ -174,35 +183,64 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void updateWeatherData(final String city) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                weatherJSONData = WeatherDataLoader.getJSONdata(city, WeatherDataLoader.WEATHER_CURRENT_DATA);
-                if (weatherJSONData != null){
-                    final WeatherRequest weatherRequest = (WeatherRequest) WeatherParser.renderWeatherData(weatherJSONData, WeatherDataLoader.WEATHER_CURRENT_DATA);
-//                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (citiesWeatherList.isCityInList(city)){
-                                Snackbar.make(getView(),"City "+ city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.openweathermap.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
+
+        openWeatherRequest.loadWeather(city, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+                .enqueue(new Callback<WeatherRequest>() {
+                    @Override
+                    public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
+                        if (response.body() != null) {
+                            if (citiesWeatherList.isCityInList(city)) {
+                                Snackbar.make(getView(), "City " + city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
                             } else {
-                                cityListAdapter.addItem(renderWeather(weatherRequest));
+                                cityListAdapter.addItem(renderWeather(response.body()));
                             }
                         }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherRequest> call, Throwable t) {
                             dlgCustom.show(getParentFragmentManager(), "");
                             editTextCity.requestFocus();
-                        }
-                    });
-                    Log.e(TAG, "Connection failed");
-                }
-            }
-        }).start();
+                    }
+                });
+
+        //***
+
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                weatherJSONData = WeatherDataLoader.getJSONdata(city, WeatherDataLoader.WEATHER_CURRENT_DATA);
+//                if (weatherJSONData != null){
+//                    final WeatherRequest weatherRequest = (WeatherRequest) WeatherParser.renderWeatherData(weatherJSONData, WeatherDataLoader.WEATHER_CURRENT_DATA);
+////                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (citiesWeatherList.isCityInList(city)){
+//                                Snackbar.make(getView(),"City "+ city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
+//                            } else {
+//                                cityListAdapter.addItem(renderWeather(weatherRequest));
+//                            }
+//                        }
+//                    });
+//                } else {
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            dlgCustom.show(getParentFragmentManager(), "");
+//                            editTextCity.requestFocus();
+//                        }
+//                    });
+//                    Log.e(TAG, "Connection failed");
+//                }
+//            }
+//        }).start();
     }
 
     private Map<String, String> renderWeather(WeatherRequest weatherRequest){
@@ -211,11 +249,14 @@ public class SelectCityFragment extends Fragment {
         localMap.put("city", weatherRequest.getName());
         localMap.put("weather", weatherRequest.getWeather()[0].getMain());
         localMap.put("temperature", String.format(Locale.getDefault(), "%.0f", weatherRequest.getMain().getTemp()) + " \u2103");
-        localMap.put("wcf",  String.format(Locale.getDefault(),"%.0f",weatherRequest.getMain().getFeels_like()) + " \u2103");
+        localMap.put("wcf",  String.format(Locale.getDefault(),"%.0f",weatherRequest.getMain().getFeelsLike()) + " \u2103");
         localMap.put("humidity", "Humidity: " + weatherRequest.getMain().getHumidity()+"%");
         localMap.put("wind", String.format("Wind: %s, %s m/s", assignWindDirection(weatherRequest.getWind().getDeg()),
                 String.format(Locale.getDefault(),"%.1f",weatherRequest.getWind().getSpeed())));
         localMap.put("cityUrl", getResources().getString(R.string.urlMoscow));
+        localMap.put("id", String.valueOf(weatherRequest.getWeather()[0].getId()));
+
+        Log.d(TAG, "renderWeather: getWeather()[0].getId(): " + weatherRequest.getWeather()[0].getId());
 
         return localMap;
     }

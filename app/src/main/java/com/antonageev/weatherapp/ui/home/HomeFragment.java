@@ -19,34 +19,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.antonageev.weatherapp.CircleTransformation;
+import com.antonageev.weatherapp.IOpenWeatherForecast;
+import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.MainActivity;
+import com.antonageev.weatherapp.MapWeatherLinks;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
-import com.antonageev.weatherapp.WeatherData;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherListAdapter;
-import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.WeatherUpdateService;
+import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
-
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,6 +72,7 @@ public class HomeFragment extends Fragment{
     private Button aboutCity;
     private MaterialButton citiesSelect;
     private MaterialButton buttonSettings;
+    private ImageView imageView;
     RecyclerView recyclerView;
     WeatherListAdapter weatherListAdapter;
 
@@ -157,7 +164,7 @@ public class HomeFragment extends Fragment{
                         Map<String, String> map = new HashMap<>();
                         map.put("day", format.format(new Date((long) list.getDt() * 1000L)));
                         map.put("weather", list.getWeather()[0].getDescription());
-                        map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", list.getMain().getTemp_max()) + " \u2103");
+                        map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", list.getMain().getTempMax()) + " \u2103");
                         resultList.add(map);
                     }
                     weatherListAdapter.weatherListDataChange(resultList);
@@ -188,6 +195,16 @@ public class HomeFragment extends Fragment{
         humidity.setText(parcel.getMapData().get(HUMIDITY));
         wind.setText(parcel.getMapData().get(WIND));
         cityUrl = parcel.getMapData().get(CITY_URL);
+
+        if (parcel.getMapData().containsKey("id")){
+            Picasso.get()
+                    .load(MapWeatherLinks.getLinkFromMap(Integer.parseInt(parcel.getMapData().get("id")) / 100))
+                    .resize(100, 100)
+                    .centerCrop()
+                    .transform(new CircleTransformation())
+                    .into(imageView);
+        }
+
     }
 
     private void initRecyclerView(List<Map<String, String>> forecast) {
@@ -218,6 +235,7 @@ public class HomeFragment extends Fragment{
         humidity = view.findViewById(R.id.humidity);
         aboutCity = view.findViewById(R.id.aboutCity);
         recyclerView = view.findViewById(R.id.recyclerView);
+        imageView = view.findViewById(R.id.imageView);
     }
 
     private Map<String, String> createInitialMapData(){
@@ -235,16 +253,48 @@ public class HomeFragment extends Fragment{
 
     private void updateForecast() {
 
-        String localCity;
+        final String localCity;
         if (localParcel != null) {
             localCity = localParcel.getMapData().get("city");
         } else {
             localCity = city.getText().toString();
         }
 
-        Intent intent = new Intent(getActivity(), WeatherUpdateService.class);
-        intent.putExtra("city", localCity);
-        getActivity().startService(intent);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.openweathermap.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
+
+        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+                .enqueue(new Callback<WeatherForecast>() {
+                    @Override
+                    public void onResponse(Call<WeatherForecast> call, Response<WeatherForecast> response) {
+                        if (response.body() != null) {
+                            SimpleDateFormat formatDay = new SimpleDateFormat("EEEE,", Locale.getDefault());
+                            SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                            List<Map<String, String>> resultList = new ArrayList<>();
+                            for (com.antonageev.weatherapp.model_forecast.List list : response.body().getList()) {
+                                Map<String, String> map = new HashMap<>();
+                                map.put("day", formatDay.format(new Date((long) list.getDt() * 1000L)));
+                                map.put("time", formatTime.format(new Date((long) list.getDt() * 1000L)));
+                                map.put("weather", list.getWeather()[0].getDescription());
+                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", list.getMain().getTempMax()) + " \u2103");
+                                resultList.add(map);
+                            }
+                            weatherListAdapter.weatherListDataChange(resultList);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherForecast> call, Throwable t) {
+                        Snackbar.make(getView(), getResources().getString(R.string.cityForecastDownloadFailed, localCity), BaseTransientBottomBar.LENGTH_SHORT).show();
+                    }
+                });
+
+//        Intent intent = new Intent(getActivity(), WeatherUpdateService.class);
+//        intent.putExtra("city", localCity);
+//        getActivity().startService(intent);
 
     }
 
