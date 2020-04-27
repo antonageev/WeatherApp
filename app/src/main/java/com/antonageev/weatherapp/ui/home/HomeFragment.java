@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherListAdapter;
+import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.WeatherUpdateService;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
@@ -59,6 +61,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class HomeFragment extends Fragment{
 
+    private static final String CITY_TO_SHOW = "cityToShow"; // key to city in sharedPrefs
     private final String TAG = this.getClass().getSimpleName();
 
     static final String PARCEL = "parcel";
@@ -127,8 +130,12 @@ public class HomeFragment extends Fragment{
 
         if (localParcel == null){
             try {
-                localParcel = new Parcel(createInitialMapData());
-                index = Integer.parseInt(localParcel.getMapData().get("index"));
+                String cityToShow = "Moscow"; // default
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                if (sharedPref != null){
+                    cityToShow = sharedPref.getString(CITY_TO_SHOW, "Paris");
+                }
+                updateCurrentWeather(cityToShow);
                 Log.w(TAG , "parcel created: " + localParcel);
             } catch (NullPointerException e){
                 Log.w(TAG, " Перехват NullPointerException при запуске MainActivity из-за проблем создания parcel");
@@ -141,9 +148,9 @@ public class HomeFragment extends Fragment{
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
         getOrInitParcel(savedInstanceState);
-        Log.wtf(TAG, "parcel object: " + localParcel);
-        Log.wtf(TAG , "parcel state CITY: " + localParcel.getMapData().get(CITY));
-        Log.wtf(TAG, "index state: " + index);
+//        Log.wtf(TAG, "parcel object: " + localParcel);
+//        Log.wtf(TAG , "parcel state CITY: " + localParcel.getMapData().get(CITY));
+//        Log.wtf(TAG, "index state: " + index);
 
         setTextViesFromParcel(localParcel);
 
@@ -188,23 +195,51 @@ public class HomeFragment extends Fragment{
     }
 
     private void setTextViesFromParcel(Parcel parcel) {
-        city.setText(parcel.getMapData().get(CITY));
-        weatherDescription.setText(parcel.getMapData().get(WEATHER));
-        temperature.setText(parcel.getMapData().get(TEMPERATURE));
-        wcf.setText(parcel.getMapData().get(WIND_CHILL_FACTOR));
-        humidity.setText(parcel.getMapData().get(HUMIDITY));
-        wind.setText(parcel.getMapData().get(WIND));
-        cityUrl = parcel.getMapData().get(CITY_URL);
 
-        if (parcel.getMapData().containsKey("id")){
-            Picasso.get()
-                    .load(MapWeatherLinks.getLinkFromMap(Integer.parseInt(parcel.getMapData().get("id")) / 100))
-                    .resize(100, 100)
-                    .centerCrop()
-                    .transform(new CircleTransformation())
-                    .into(imageView);
+        if (parcel != null){
+            city.setText(parcel.getCityData().cityName);
+            weatherDescription.setText(parcel.getCityData().description);
+            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", parcel.getCityData().tempMax, "\u2103"));
+            wcf.setText(String.format(Locale.getDefault(),"%.0f %s", parcel.getCityData().wcf, "\u2103"));
+            humidity.setText(String.format(Locale.getDefault(),"%s: %d %s", getResources().getString(R.string.stringHumid),
+                    parcel.getCityData().humidity, "%"));
+            wind.setText(String.format("Wind: %s, %s m/s", assignWindDirection(parcel.getCityData().degrees),
+                    String.format(Locale.getDefault(),"%.1f",parcel.getCityData().windSpeed)));
+
+
+            if (parcel.getCityData().idResponse > 0){
+                Picasso.get()
+                        .load(MapWeatherLinks.getLinkFromMap(parcel.getCityData().idResponse / 100))
+                        .resize(100, 100)
+                        .centerCrop()
+                        .transform(new CircleTransformation())
+                        .into(imageView);
+            }
+            try {
+                SharedPreferences sharedPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString(CITY_TO_SHOW, parcel.getCityData().cityName);
+                editor.apply();
+            } catch (NullPointerException e){
+                Log.w(TAG, "setTextViesFromParcel: getActivity().getPreferences = NullPointer");
+                e.printStackTrace();
+            }
+
         }
 
+
+    }
+
+    private String assignWindDirection(int degrees){
+        if (degrees > 22 && degrees <= 67) return getResources().getStringArray(R.array.windDirection)[0];
+        if (degrees > 68 && degrees <= 112) return getResources().getStringArray(R.array.windDirection)[1];
+        if (degrees > 112 && degrees <= 157) return getResources().getStringArray(R.array.windDirection)[2];
+        if (degrees > 157 && degrees <= 202) return getResources().getStringArray(R.array.windDirection)[3];
+        if (degrees > 202 && degrees <= 247) return getResources().getStringArray(R.array.windDirection)[4];
+        if (degrees > 247 && degrees <= 292) return getResources().getStringArray(R.array.windDirection)[5];
+        if (degrees > 292 && degrees <= 337) return getResources().getStringArray(R.array.windDirection)[6];
+        if (degrees > 337 || degrees <= 22) return getResources().getStringArray(R.array.windDirection)[7];
+        return "unknown";
     }
 
     private void initRecyclerView(List<Map<String, String>> forecast) {
@@ -239,6 +274,7 @@ public class HomeFragment extends Fragment{
     }
 
     private Map<String, String> createInitialMapData(){
+
         Map<String, String> initMap = new HashMap<>();
         initMap.put("index", "0"); // "0" for "Moscow" as default
         initMap.put(CITY, city.getText().toString());
@@ -251,11 +287,34 @@ public class HomeFragment extends Fragment{
         return initMap;
     }
 
+    private void updateCurrentWeather(String localCityName){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.openweathermap.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
+
+        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+                .enqueue(new Callback<WeatherRequest>() {
+                    @Override
+                    public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
+                        localParcel = new Parcel(WeatherParser.createCityFromWeatherRequest(response.body()));
+                        setTextViesFromParcel(localParcel);
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                        Snackbar.make(getView(), "trouble with connection to get weather for " + localCityName, BaseTransientBottomBar.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
     private void updateForecast() {
 
         final String localCity;
         if (localParcel != null) {
-            localCity = localParcel.getMapData().get("city");
+            localCity = localParcel.getCityData().cityName;
         } else {
             localCity = city.getText().toString();
         }

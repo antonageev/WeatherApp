@@ -9,33 +9,33 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import com.antonageev.weatherapp.App;
 import com.antonageev.weatherapp.CityListAdapter;
+import com.antonageev.weatherapp.CitySource;
 import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
-import com.antonageev.weatherapp.WeatherData;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherParser;
+import com.antonageev.weatherapp.database.CitiesDao;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,21 +56,17 @@ public class SelectCityFragment extends Fragment {
 
     private static final String PARCEL = "parcel";
     private final String TAG = this.getClass().getSimpleName();
-    private final Handler handler = new Handler();
 
     Parcel currentParcel;
     private MaterialButton findButton;
     private TextInputEditText editTextCity;
-    private CitiesWeatherList citiesWeatherList;
     private RecyclerView recyclerView;
 
     private CityListAdapter cityListAdapter;
 
-    private WeatherData resultData;
+    private CitySource citySource;
 
     private DialogCustomFragment dlgCustom;
-
-    private JSONObject weatherJSONData;
 
     private boolean mDualPane;
 
@@ -101,25 +97,8 @@ public class SelectCityFragment extends Fragment {
 
         dlgCustom = new DialogCustomFragment();
 
-        if (sharedViewModel == null) {
-            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        }
-        citiesWeatherList = sharedViewModel.getStoredCitiesWeatherList().getValue();
-        if (citiesWeatherList == null){
-            citiesWeatherList = new CitiesWeatherList(new ArrayList<Map<String, String>>());
-        }
         initViews(view);
         setListeners();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (sharedViewModel == null){
-            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-        }
-        sharedViewModel.saveCitiesWeatherList(citiesWeatherList);
     }
 
     @Override
@@ -128,31 +107,67 @@ public class SelectCityFragment extends Fragment {
         mDualPane = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
         initRecyclerView();
+    }
 
+
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        Handler handler = new Handler();
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.remove_context:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        citySource.deleteCityByName(cityListAdapter.getSelectedCity());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                cityListAdapter.notifyItemRemoved((int)cityListAdapter.getSelectedPosition());
+                                Log.wtf(TAG, "onContextItemSelected: notify");
+                            }
+                        });
+                    }
+                }).start();
+
+                return true;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     private void initRecyclerView() {
-        cityListAdapter = new CityListAdapter(citiesWeatherList.getList());
-        LinearLayoutManager lt = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
-        recyclerView.setLayoutManager(lt);
-        recyclerView.setAdapter(cityListAdapter);
-        cityListAdapter.setOnItemClickListener(new CityListAdapter.OnItemClickListener() {
+        new Thread(new Runnable() {
             @Override
-            public void onItemClick(View view, final int position) {
-                Snackbar.make(view, getResources().getString(R.string.snackBarSure), BaseTransientBottomBar.LENGTH_SHORT).
-                        setAction(getResources().getString(R.string.confirm), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                currentParcel = new Parcel(cityListAdapter.getDataSource().get(position));
-                                showMainFragment(currentParcel);
-                            }
-                        }).show();
-            }
-        });
+            public void run() {
+                CitiesDao citiesDao = App.getInstance().getCitiesDao();
+                citySource = new CitySource(citiesDao);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        dividerItemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
-        recyclerView.addItemDecoration(dividerItemDecoration);
+                cityListAdapter = new CityListAdapter(citySource, getActivity());
+                LinearLayoutManager lt = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
+                recyclerView.setLayoutManager(lt);
+                recyclerView.setAdapter(cityListAdapter);
+                cityListAdapter.setOnItemClickListener(new CityListAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, final int position) {
+                        Snackbar.make(view, getResources().getString(R.string.snackBarSure), BaseTransientBottomBar.LENGTH_SHORT).
+                                setAction(getResources().getString(R.string.confirm), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        currentParcel = new Parcel(cityListAdapter.getDataSource().getCities().get(position));
+                                        showMainFragment(currentParcel);
+                                    }
+                                }).show();
+                    }
+                });
+
+//                DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
+//                dividerItemDecoration.setDrawable(requireActivity().getDrawable(R.drawable.separator));
+//                recyclerView.addItemDecoration(dividerItemDecoration);
+            }
+        }).start();
+
     }
 
     private void showMainFragment(Parcel parcel) {
@@ -183,6 +198,7 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void updateWeatherData(final String city) {
+        Handler handler = new Handler();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -194,10 +210,11 @@ public class SelectCityFragment extends Fragment {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
                         if (response.body() != null) {
-                            if (citiesWeatherList.isCityInList(city)) {
-                                Snackbar.make(getView(), "City " + city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            if (citySource.getCityByName(city) == null){
+                                citySource.addCity(WeatherParser.createCityFromWeatherRequest(response.body()));
+                                cityListAdapter.notifyDataSetChanged();
                             } else {
-                                cityListAdapter.addItem(renderWeather(response.body()));
+                                Snackbar.make(getView(), String.format(getString(R.string.cityAlreadyInList), city), BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         }
                     }

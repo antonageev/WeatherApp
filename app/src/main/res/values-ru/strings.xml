@@ -19,7 +19,7 @@
     <string name="windSpeedAndDirection">Ветер: СЗ, 2 м/с</string>
     <string name="wcf_text">Ощущается:  </string>
     <string name="windChillFactor">3 С</string>
-    <string name="stringHumid">Влажность: 85%</string>
+    <string name="stringHumid">Влажность</string>
     <string name="stringWeatherDescription">Облачно</string>
     <string name="stringContent">Почасовой прогноз на СЕГОДНЯ через ViewPager</string>
     <string name="stringContentTom">Почасовой прогноз на ЗАВТРА через ViewPager</string>
@@ -53,10 +53,12 @@
     <string name="Sorry">Простите, конечно!</string>
     <string name="cityNotFoundExclamation">Но похоже, что годод %1$s не cуществует</string>
     <string name="cityForecastDownloadFailed">Не могу загрузить данные для города %1$s</string>
+    <string name="cityAlreadyInList">Город %1$s уже в списке</string>
     <string name="no">Нет</string>
     <string name="OKBtn">ОК</string>
     <string name="didn_t_know">Хмм</string>
     <string name="yes">YES</string>
+    <string name="remove">Удалить</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>
