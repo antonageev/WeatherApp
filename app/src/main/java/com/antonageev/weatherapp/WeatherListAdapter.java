@@ -34,6 +34,7 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     @Override
     public void onBindViewHolder(@NonNull WeatherListAdapter.ViewHolder holder, int position) {
         holder.getTextViewDay().setText(dataSource.get(position).get("day"));
+        holder.getTextViewTime().setText(dataSource.get(position).get("time"));
         holder.getTextViewWeather().setText(dataSource.get(position).get("weather"));
         holder.getTextViewMaxTemperature().setText(dataSource.get(position).get("maxTemperature"));
     }
@@ -47,10 +48,12 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
         private TextView textViewDay;
         private TextView textViewWeather;
         private TextView textViewMaxTemperature;
+        private TextView textViewTime;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDay = itemView.findViewById(R.id.day);
+            textViewTime = itemView.findViewById(R.id.time);
             textViewWeather = itemView.findViewById(R.id.weather);
             textViewMaxTemperature = itemView.findViewById(R.id.maxTemperature);
         }
@@ -65,6 +68,10 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
 
         TextView getTextViewMaxTemperature() {
             return textViewMaxTemperature;
+        }
+
+        TextView getTextViewTime() {
+            return textViewTime;
         }
     }
 }

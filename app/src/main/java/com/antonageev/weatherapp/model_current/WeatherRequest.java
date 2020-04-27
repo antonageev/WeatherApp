@@ -1,12 +1,29 @@
 package com.antonageev.weatherapp.model_current;
 
 import com.antonageev.weatherapp.WeatherData;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class WeatherRequest implements WeatherData {
+
+    @SerializedName("main")
+    @Expose
     private Main main;
+
+    @SerializedName("weather")
+    @Expose
     private Weather[] weather;
+
+    @SerializedName("wind")
+    @Expose
     private Wind wind;
+
+    @SerializedName("name")
+    @Expose
     private String name;
+
+    @SerializedName("dt")
+    @Expose
     private int dt;
 
     public Main getMain() {

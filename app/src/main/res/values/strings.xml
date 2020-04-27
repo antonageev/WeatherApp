@@ -52,10 +52,15 @@
     <string name="confirm">confirm</string>
     <string name="Sorry">Sorry!</string>
     <string name="cityNotFoundExclamation">Seems to be that city %1$s doesn\'t exist</string>
+    <string name="cityForecastDownloadFailed">Cannot download forecast for %1$s</string>
     <string name="OKBtn">OK</string>
     <string name="didn_t_know">Hmm</string>
     <string name="no">NO</string>
     <string name="yes">YES</string>
+
+    <string-array name="linksToWeatherPictures">
+        <item>https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1050&amp;q=80</item>
+    </string-array>
 
     <string-array name="days">
         <item>today</item>

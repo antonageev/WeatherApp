@@ -1,7 +1,16 @@
 package com.antonageev.weatherapp.model_current;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Wind {
+
+    @SerializedName("speed")
+    @Expose
     private float speed;
+
+    @SerializedName("deg")
+    @Expose
     private int deg;
 
     public float getSpeed() {

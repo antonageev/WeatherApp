@@ -12,9 +12,9 @@ public class WeatherParser {
         if (weatherData == null) return null;
         WeatherData resultWeatherData = null;
         Gson gson = new Gson();
-        if (type == WeatherDataLoader.WEATHER_CURRENT_DATA){
+        if (type.equals(WeatherDataLoader.WEATHER_CURRENT_DATA)){
             resultWeatherData = gson.fromJson(String.valueOf(weatherData), WeatherRequest.class);
-        } else if (type == WeatherDataLoader.WEATHER_FORECAST_DATA){
+        } else if (type.equals(WeatherDataLoader.WEATHER_FORECAST_DATA)){
             resultWeatherData = gson.fromJson(String.valueOf(weatherData), WeatherForecast.class);
         }
         return resultWeatherData;
