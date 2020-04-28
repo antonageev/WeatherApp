@@ -1,5 +1,6 @@
 package com.antonageev.weatherapp;
 
+import com.antonageev.weatherapp.database.City;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.google.gson.Gson;
@@ -18,5 +19,21 @@ public class WeatherParser {
             resultWeatherData = gson.fromJson(String.valueOf(weatherData), WeatherForecast.class);
         }
         return resultWeatherData;
+    }
+
+    public static City createCityFromWeatherRequest(WeatherRequest weatherRequest){
+
+        City city = new City();
+        city.cityName = weatherRequest.getName();
+        city.description = weatherRequest.getWeather()[0].getMain();
+        city.tempMax = weatherRequest.getMain().getTemp();
+        city.wcf = weatherRequest.getMain().getFeelsLike();
+        city.humidity = weatherRequest.getMain().getHumidity();
+        city.degrees = weatherRequest.getWind().getDeg();
+        city.windSpeed = weatherRequest.getWind().getSpeed();
+        city.dateTime = (long)weatherRequest.getDt() * 1000L;
+        city.idResponse = weatherRequest.getWeather()[0].getId();
+
+        return city;
     }
 }
