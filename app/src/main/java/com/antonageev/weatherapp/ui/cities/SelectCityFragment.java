@@ -107,6 +107,8 @@ public class SelectCityFragment extends Fragment {
         mDualPane = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 
         initRecyclerView();
+
+        if (mDualPane) Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(R.id.nav_home);
     }
 
 
