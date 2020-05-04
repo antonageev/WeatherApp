@@ -165,6 +165,12 @@ public class HomeFragment extends Fragment{
 
         initRecyclerView(new ArrayList<Map<String, String>>());
 
+        initBroadcastReceivers();
+
+        updateForecast();
+    }
+
+    private void initBroadcastReceivers() {
         forecastBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -193,8 +199,6 @@ public class HomeFragment extends Fragment{
                 updateForecast();
             }
         };
-
-        updateForecast();
     }
 
     @Override
@@ -371,19 +375,14 @@ public class HomeFragment extends Fragment{
                         Snackbar.make(getView(), getResources().getString(R.string.cityForecastDownloadFailed, localCity), BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 });
-
-//        Intent intent = new Intent(getActivity(), WeatherUpdateService.class);
-//        intent.putExtra("city", localCity);
-//        getActivity().startService(intent);
-
     }
 
     private void makeNotification() {
         NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), "1")
                 .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentTitle("Riders on the storm")
-                .setContentText("expected within 3 hours");
+                .setContentTitle(getString(R.string.ThunderTitle))
+                .setContentText(getString(R.string.within3Hours));
         notificationManager.notify(notificationMessageId++, builder.build());
     }
 

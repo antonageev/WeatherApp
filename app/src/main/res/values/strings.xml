@@ -61,6 +61,8 @@
     <string name="remove">Remove</string>
     <string name="google_maps_key" translatable="false">AIzaSyA9ALoJTycNTEyIYrzkaJ-lawqC_SPBrIU</string>
     <string name="windDirection">Wind: %1$s, %2$s m/s</string>
+    <string name="ThunderTitle">Riders on the storm</string>
+    <string name="within3Hours">expected within 3 hours</string>
 
     <string-array name="linksToWeatherPictures">
         <item>https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1050&amp;q=80</item>

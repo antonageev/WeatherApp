@@ -35,6 +35,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.antonageev.weatherapp.broadcastreceivers.NetworkStateReceiver;
+import com.antonageev.weatherapp.services.LocationUpdateService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -77,8 +78,6 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 requestForPermissions(MainActivity.this);
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -100,15 +99,14 @@ public class MainActivity extends AppCompatActivity{
 
         registerReceiver(networkStateReceiver, new IntentFilter("com.antonageev.weatherapp.NetworkStateChange"));
 
-//        Intent intent = new Intent(this, LocationUpdateService.class);
-//        startService(intent);
+
         requestForPermissions(this);
     }
 
     private void requestForPermissions(Activity activity) {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            requestLocation();
+            launchLocationService();
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         }
@@ -124,77 +122,13 @@ public class MainActivity extends AppCompatActivity{
                     break;
                 }
             }
-            if (permit) requestLocation();
+            if (permit) launchLocationService();
         }
     }
 
-    private void requestLocation(){
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                currentLocation = location;
-                getCityFromLocation(currentLocation);
-                Log.wtf(TAG, " onLocationChanged: " + currentLocation);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        String provider = locationManager.getBestProvider(criteria, true);
-        if (provider != null){
-            Log.wtf(TAG, " requestLocation(): provider NOT NULL and launched getLastKnownLocation");
-            currentLocation = locationManager.getLastKnownLocation(provider);
-            Log.wtf(TAG, " requestLocation(): getLastKnownLocation: " + currentLocation);
-            locationManager.requestLocationUpdates(provider, 10000, 10, locationListener);
-            Log.wtf(TAG, " requestLocation(): requestLocationUpdates: " + currentLocation);
-        }
-        getCityFromLocation(currentLocation);
-    }
-
-    private void getCityFromLocation(Location location){
-        Geocoder geocoder = new Geocoder(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String cityName = "Not found";
-                    List<Address> listAddress = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 3);
-
-                    for (Address adr : listAddress) {
-                        if (adr != null){
-                            String city = adr.getLocality();
-                            if (city!=null && !city.equals("")){
-                                cityName = city;
-                                Log.d("CITY_EXTRACT_FROM_LOCATION", "run: " + cityName);
-                                Intent intent = new Intent(LOCATION_INTENT_FILTER);
-                                intent.putExtra("cityToShow", cityName);
-                                sendBroadcast(intent);
-                                break;
-                            }
-                        }
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    private void launchLocationService() {
+        Intent intent = new Intent(this, LocationUpdateService.class);
+        startService(intent);
     }
 
     private void initTokenFromFirebaseForTesting() {

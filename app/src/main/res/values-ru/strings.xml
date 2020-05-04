@@ -60,6 +60,8 @@
     <string name="yes">Да</string>
     <string name="remove">Удалить</string>
     <string name="windDirection">Ветер: %1$s, %2$s м/с</string>
+    <string name="ThunderTitle">Штормовое предупреждение</string>
+    <string name="within3Hours">в течение ближайших 3-х часов ожидается гроза</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>
