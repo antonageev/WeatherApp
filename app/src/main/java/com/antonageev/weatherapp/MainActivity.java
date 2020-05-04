@@ -1,10 +1,19 @@
 package com.antonageev.weatherapp;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,12 +26,20 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.antonageev.weatherapp.broadcastreceivers.NetworkStateReceiver;
 import com.antonageev.weatherapp.observer.Publisher;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class MainActivity extends AppCompatActivity{
+
+    NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
+    ConnectivityChecker connectivityChecker;
 
     public static final String WEATHER_FORECAST_INTENT_FILTER = "com.antonageev.weatherapp.forecast";
     private AppBarConfiguration mAppBarConfiguration;
@@ -38,6 +55,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initNotificationChannel();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -60,6 +78,42 @@ public class MainActivity extends AppCompatActivity{
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        initTokenFromFirebaseForTesting();
+
+        connectivityChecker = new ConnectivityChecker(this);
+
+        registerReceiver(networkStateReceiver, new IntentFilter("com.antonageev.weatherapp.NetworkStateChange"));
+
+    }
+
+    private void initTokenFromFirebaseForTesting() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("MainActivity", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        String msg =  token;
+                        Log.d("MainActivity", msg);
+//                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void initNotificationChannel(){
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("1", "LBC", importance);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     @Override
@@ -74,5 +128,11 @@ public class MainActivity extends AppCompatActivity{
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkStateReceiver);
     }
 }

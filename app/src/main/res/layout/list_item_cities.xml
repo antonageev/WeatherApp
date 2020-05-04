@@ -11,7 +11,7 @@
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="2dp"
     android:orientation="vertical">
-<FrameLayout
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="80dp">
@@ -19,35 +19,41 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_gravity="start|center_vertical"
+        android:layout_weight="2"
+        android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/text_view_city"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:textSize="24sp" />
+            android:textAlignment="viewStart"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/text_view_date_time"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textAlignment="viewStart"/>
     </LinearLayout>
     <TextView
         android:id="@+id/text_view_weather"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:textSize="20sp"
-        android:layout_gravity="center_horizontal|center_vertical"/>
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/text_view_temperature"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:textSize="20sp"
-        android:layout_gravity="end|center_vertical"/>
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:textAlignment="viewEnd"/>
 
-</FrameLayout>
+</LinearLayout>
 </androidx.cardview.widget.CardView>

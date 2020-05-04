@@ -5,8 +5,10 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity (indices = {@Index(value = {"city_name"})})
-public class City {
+public class City implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     public long idCity;
