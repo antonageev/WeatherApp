@@ -1,5 +1,6 @@
 package com.antonageev.weatherapp.ui.home;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -34,8 +36,8 @@ import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherListAdapter;
 import com.antonageev.weatherapp.WeatherParser;
-import com.antonageev.weatherapp.WeatherUpdateService;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
+import com.antonageev.weatherapp.model_forecast.ListWeather;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -87,7 +89,10 @@ public class HomeFragment extends Fragment{
     private final String HUMIDITY = "humidity";
     private final String CITY_URL = "cityUrl";
 
-    private BroadcastReceiver broadcastReceiver;
+    private int notificationMessageId = 400;
+
+    private BroadcastReceiver forecastBroadcastReceiver;
+    private BroadcastReceiver locationBroadcastReceiver;
 
     private String cityUrl;
 
@@ -160,22 +165,32 @@ public class HomeFragment extends Fragment{
 
         initRecyclerView(new ArrayList<Map<String, String>>());
 
-        broadcastReceiver = new BroadcastReceiver() {
+        forecastBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 WeatherForecast weatherForecast = (WeatherForecast) intent.getSerializableExtra("cityForecast");
                 if (weatherForecast != null) {
                     SimpleDateFormat format = new SimpleDateFormat("EEEE, HH:mm", Locale.getDefault());
                     List<Map<String, String>> resultList = new ArrayList<>();
-                    for (com.antonageev.weatherapp.model_forecast.List list : weatherForecast.getList()) {
+                    for (ListWeather listWeather : weatherForecast.getListWeather()) {
                         Map<String, String> map = new HashMap<>();
-                        map.put("day", format.format(new Date((long) list.getDt() * 1000L)));
-                        map.put("weather", list.getWeather()[0].getDescription());
-                        map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", list.getMain().getTempMax()) + " \u2103");
+                        map.put("day", format.format(new Date((long) listWeather.getDt() * 1000L)));
+                        map.put("weather", listWeather.getWeather()[0].getDescription());
+                        map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", listWeather.getMain().getTempMax()) + " \u2103");
                         resultList.add(map);
                     }
                     weatherListAdapter.weatherListDataChange(resultList);
                 }
+            }
+        };
+
+        locationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String cityToShow = intent.getStringExtra("cityToShow");
+
+                updateCurrentWeather(cityToShow);
+                updateForecast();
             }
         };
 
@@ -185,13 +200,16 @@ public class HomeFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().registerReceiver(broadcastReceiver, new IntentFilter(MainActivity.WEATHER_FORECAST_INTENT_FILTER));
+//        getActivity().registerReceiver(forecastBroadcastReceiver, new IntentFilter(MainActivity.WEATHER_FORECAST_INTENT_FILTER));
+        getActivity().registerReceiver(locationBroadcastReceiver, new IntentFilter(MainActivity.LOCATION_INTENT_FILTER));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(broadcastReceiver);
+//        getActivity().unregisterReceiver(forecastBroadcastReceiver);
+        getActivity().unregisterReceiver(locationBroadcastReceiver);
+
     }
 
     private void setTextViesFromParcel(Parcel parcel) {
@@ -203,7 +221,7 @@ public class HomeFragment extends Fragment{
             wcf.setText(String.format(Locale.getDefault(),"%.0f %s", parcel.getCityData().wcf, "\u2103"));
             humidity.setText(String.format(Locale.getDefault(),"%s: %d %s", getResources().getString(R.string.stringHumid),
                     parcel.getCityData().humidity, "%"));
-            wind.setText(String.format("Wind: %s, %s m/s", assignWindDirection(parcel.getCityData().degrees),
+            wind.setText(String.format(getString(R.string.windDirection), assignWindDirection(parcel.getCityData().degrees),
                     String.format(Locale.getDefault(),"%.1f",parcel.getCityData().windSpeed)));
 
 
@@ -333,13 +351,16 @@ public class HomeFragment extends Fragment{
                             SimpleDateFormat formatDay = new SimpleDateFormat("EEEE,", Locale.getDefault());
                             SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
                             List<Map<String, String>> resultList = new ArrayList<>();
-                            for (com.antonageev.weatherapp.model_forecast.List list : response.body().getList()) {
+                            for (ListWeather listWeather : response.body().getListWeather()) {
                                 Map<String, String> map = new HashMap<>();
-                                map.put("day", formatDay.format(new Date((long) list.getDt() * 1000L)));
-                                map.put("time", formatTime.format(new Date((long) list.getDt() * 1000L)));
-                                map.put("weather", list.getWeather()[0].getDescription());
-                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", list.getMain().getTempMax()) + " \u2103");
+                                map.put("day", formatDay.format(new Date((long) listWeather.getDt() * 1000L)));
+                                map.put("time", formatTime.format(new Date((long) listWeather.getDt() * 1000L)));
+                                map.put("weather", listWeather.getWeather()[0].getDescription());
+                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", listWeather.getMain().getTempMax()) + " \u2103");
                                 resultList.add(map);
+                            }
+                            if (response.body().getListWeather()[0].getWeather()[0].getId() / 100 == 2) {
+                                makeNotification();
                             }
                             weatherListAdapter.weatherListDataChange(resultList);
                         }
@@ -355,6 +376,15 @@ public class HomeFragment extends Fragment{
 //        intent.putExtra("city", localCity);
 //        getActivity().startService(intent);
 
+    }
+
+    private void makeNotification() {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), "1")
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle("Riders on the storm")
+                .setContentText("expected within 3 hours");
+        notificationManager.notify(notificationMessageId++, builder.build());
     }
 
 }

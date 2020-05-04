@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.services;
 
 import android.util.Log;
 

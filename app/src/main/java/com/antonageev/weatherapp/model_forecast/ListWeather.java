@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class List implements Serializable {
+public class ListWeather implements Serializable {
     @SerializedName("main")
     @Expose
     private Main main;

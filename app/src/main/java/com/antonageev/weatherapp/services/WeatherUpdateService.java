@@ -1,4 +1,4 @@
-package com.antonageev.weatherapp;
+package com.antonageev.weatherapp.services;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -6,6 +6,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.antonageev.weatherapp.MainActivity;
+import com.antonageev.weatherapp.WeatherDataLoader;
+import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 
 import org.json.JSONObject;

@@ -53,12 +53,14 @@
     <string name="Sorry">Sorry!</string>
     <string name="cityNotFoundExclamation">Seems to be that city %1$s doesn\'t exist</string>
     <string name="cityForecastDownloadFailed">Cannot download forecast for %1$s</string>
-    <string name="cityAlreadyInList">City %1$s already in list</string>
+    <string name="cityAlreadyInList">City %1$s already in listWeather</string>
     <string name="OKBtn">OK</string>
     <string name="didn_t_know">Hmm</string>
     <string name="no">NO</string>
     <string name="yes">YES</string>
     <string name="remove">Remove</string>
+    <string name="google_maps_key" translatable="false">AIzaSyA9ALoJTycNTEyIYrzkaJ-lawqC_SPBrIU</string>
+    <string name="windDirection">Wind: %1$s, %2$s m/s</string>
 
     <string-array name="linksToWeatherPictures">
         <item>https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1050&amp;q=80</item>
