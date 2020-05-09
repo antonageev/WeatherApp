@@ -57,8 +57,11 @@
     <string name="no">Нет</string>
     <string name="OKBtn">ОК</string>
     <string name="didn_t_know">Хмм</string>
-    <string name="yes">YES</string>
+    <string name="yes">Да</string>
     <string name="remove">Удалить</string>
+    <string name="windDirection">Ветер: %1$s, %2$s м/с</string>
+    <string name="ThunderTitle">Штормовое предупреждение</string>
+    <string name="within3Hours">в течение ближайших 3-х часов ожидается гроза</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>

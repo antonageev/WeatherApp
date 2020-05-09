@@ -1,7 +1,5 @@
 package com.antonageev.weatherapp.model_forecast;
 
-import android.os.Parcelable;
-
 import com.antonageev.weatherapp.WeatherData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -12,18 +10,18 @@ public class WeatherForecast implements WeatherData, Serializable {
 
     @SerializedName("list")
     @Expose
-    private List[] list;
+    private ListWeather[] listWeather;
 
     @SerializedName("city")
     @Expose
     private City city;
 
-    public List[] getList() {
-        return list;
+    public ListWeather[] getListWeather() {
+        return listWeather;
     }
 
-    public void setList(List[] list) {
-        this.list = list;
+    public void setListWeather(ListWeather[] listWeather) {
+        this.listWeather = listWeather;
     }
 
     public City getCity() {
