@@ -31,6 +31,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.antonageev.weatherapp.broadcastreceivers.NetworkStateReceiver;
 import com.antonageev.weatherapp.services.LocationUpdateService;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
     ConnectivityChecker connectivityChecker;
-    private GoogleMap mMap;
 
     public static final String WEATHER_FORECAST_INTENT_FILTER = "com.antonageev.weatherapp.forecast";
     public static final String LOCATION_INTENT_FILTER = "com.antonageev.weatherapp.location";
@@ -86,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
         connectivityChecker = new ConnectivityChecker(this);
 
         registerReceiver(networkStateReceiver, new IntentFilter("com.antonageev.weatherapp.NetworkStateChange"));
-
-
     }
+
+
 
     private void setVisibilityOfMapMenuItem(NavigationView navigationView) {
         Menu menu = navigationView.getMenu();

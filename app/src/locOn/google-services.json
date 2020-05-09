@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:562256445068:android:403eb732d2b2aa1c1605a9",
         "android_client_info": {
-          "package_name": "com.antonageev.weatherapp.locon.debug"
+          "package_name": "com.antonageev.weatherapp"
         }
       },
       "oauth_client": [
