@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp.ui.settings;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,7 +16,9 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.Switch;
 
+import com.antonageev.weatherapp.MainActivity;
 import com.antonageev.weatherapp.R;
+import com.antonageev.weatherapp.WeatherDataLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -32,17 +36,16 @@ public class SettingsFragment extends Fragment {
     private final String TAG = SettingsFragment.class.getSimpleName();
 
     private Switch switchDarkTheme;
-    private RadioButton windMetersPerSecond;
-    private RadioButton windKmPerHour;
-    private RadioButton tempCels;
-    private RadioButton tempFh;
+
+    private RadioButton radioButtonMetric;
+    private RadioButton radioButtonImperial;
     private SignInButton signInButton;
     private MaterialButton signOutButton;
 
     private MaterialTextView nameTextView;
     private MaterialTextView emailTextView;
 
-    private SettingsHandler settingsHandler;
+    private SharedPreferences sharedPreferences;
 
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount account;
@@ -58,8 +61,8 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        settingsHandler = SettingsHandler.getInstance();
         initViews(view);
+        initUIFromPreferences();
         setListeners();
 
         googleSignInInit();
@@ -67,12 +70,19 @@ public class SettingsFragment extends Fragment {
         account = GoogleSignIn.getLastSignedInAccount(requireActivity());
         updateUI(account);
 
-        switchDarkTheme.setChecked(settingsHandler.isDarkTheme());
+    }
+
+    private void initUIFromPreferences() {
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        switchDarkTheme.setChecked(sharedPreferences.getBoolean(MainActivity.KEY_DARK_THEME, false));
         setTextToSwitcher();
-        windMetersPerSecond.setChecked(settingsHandler.isMetersPerSecondChecked());
-        windKmPerHour.setChecked(settingsHandler.isKmPerHourChecked());
-        tempCels.setChecked(settingsHandler.isCelsiusChecked());
-        tempFh.setChecked(settingsHandler.isFhChecked());
+
+        if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
+            radioButtonImperial.setChecked(true);
+        } else {
+            radioButtonMetric.setChecked(true);
+        }
+
     }
 
     private void googleSignInInit() {
@@ -142,10 +152,9 @@ public class SettingsFragment extends Fragment {
 
     private void initViews(View view){
         switchDarkTheme = view.findViewById(R.id.switchDarkTheme);
-        windMetersPerSecond = view.findViewById(R.id.radioButtonMS);
-        windKmPerHour = view.findViewById(R.id.radioButtonKmHour);
-        tempCels = view.findViewById(R.id.radioButtonCelsius);
-        tempFh = view.findViewById(R.id.radioButtonFahrenheit);
+        radioButtonMetric = view.findViewById(R.id.radioButtonMetric);
+        radioButtonImperial = view.findViewById(R.id.radioButtonImperial);
+
         signInButton = view.findViewById(R.id.sign_in_button);
         nameTextView = view.findViewById(R.id.nameTextView);
         emailTextView = view.findViewById(R.id.emailTextView);
@@ -159,42 +168,28 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 setTextToSwitcher();
-                settingsHandler.setDarkTheme(switchDarkTheme.isChecked());
+                SharedPreferences.Editor editor =  sharedPreferences.edit();
+                editor.putBoolean(MainActivity.KEY_DARK_THEME, switchDarkTheme.isChecked());
+                editor.apply();
             }
         });
-        windMetersPerSecond.setOnClickListener(new View.OnClickListener() {
+        radioButtonMetric.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (windMetersPerSecond.isChecked()) {
-                    settingsHandler.setMetersPerSecondChecked(true);
-                    settingsHandler.setKmPerHourChecked(false);
+                if (radioButtonMetric.isChecked()) {
+                    SharedPreferences.Editor editor =  sharedPreferences.edit();
+                    editor.putString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC);
+                    editor.apply();
                 }
             }
         });
-        windKmPerHour.setOnClickListener(new View.OnClickListener() {
+        radioButtonImperial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (windKmPerHour.isChecked()){
-                    settingsHandler.setKmPerHourChecked(true);
-                    settingsHandler.setMetersPerSecondChecked(false);
-                }
-            }
-        });
-        tempCels.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (tempCels.isChecked()){
-                    settingsHandler.setCelsiusChecked(true);
-                    settingsHandler.setFhChecked(false);
-                }
-            }
-        });
-        tempFh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (tempFh.isChecked()){
-                    settingsHandler.setFhChecked(true);
-                    settingsHandler.setCelsiusChecked(false);
+                if (radioButtonImperial.isChecked()){
+                    SharedPreferences.Editor editor =  sharedPreferences.edit();
+                    editor.putString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_IMPERIAL);
+                    editor.apply();
                 }
             }
         });
@@ -211,8 +206,6 @@ public class SettingsFragment extends Fragment {
             }
         });
     }
-
-
 
     private void setTextToSwitcher() {
         if (switchDarkTheme.isChecked()) {

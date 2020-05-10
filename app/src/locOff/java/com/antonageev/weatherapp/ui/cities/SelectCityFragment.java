@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -204,7 +203,7 @@ public class SelectCityFragment extends Fragment {
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(city, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(city, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {

@@ -73,7 +73,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:checked="false"
         android:text="@string/textSwitchDarkThemeOff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/settingsDarkTheme"/>
@@ -87,12 +86,12 @@
         app:layout_constraintTop_toBottomOf="@id/switchDarkTheme" />
 
     <TextView
-        android:id="@+id/settingsWindSpeed"
+        android:id="@+id/settingsMeasurement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="@string/wind_speed"
+        android:text="@string/measurement_system"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsDivider" />
@@ -102,59 +101,22 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/settingsWindSpeed"
+        app:layout_constraintTop_toTopOf="@id/settingsMeasurement"
         app:layout_constraintEnd_toEndOf="parent">
 
         <RadioButton
-            android:id="@+id/radioButtonMS"
+            android:id="@+id/radioButtonMetric"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/metersPerSecond"
-            android:checked="true"/>
+            android:text="@string/metric"/>
 
         <RadioButton
-            android:id="@+id/radioButtonKmHour"
+            android:id="@+id/radioButtonImperial"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/kilometers" />
-
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/settingsTemperature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/settingsTemperature"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settingsWindSpeed" />
-
-    <RadioGroup
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@id/settingsTemperature"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <RadioButton
-            android:id="@+id/radioButtonCelsius"
-            android:layout_width="75dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settingsTextCelsius"
-            android:checked="true"/>
-
-        <RadioButton
-            android:id="@+id/radioButtonFahrenheit"
-            android:layout_width="75dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/settingsTextFahrenheit" />
+            android:text="@string/imperial" />
 
     </RadioGroup>
 

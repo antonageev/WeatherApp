@@ -69,6 +69,9 @@
     <string name="menu_map_mode_normal">Normal</string>
     <string name="menu_map_mode_satellite">Satellite</string>
     <string name="menu_map_mode_terrain">Terrain</string>
+    <string name="measurement_system">Система мер</string>
+    <string name="metric">Метрическая</string>
+    <string name="imperial">Имперская</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>

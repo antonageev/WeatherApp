@@ -68,6 +68,9 @@
     <string name="action_map">Locate</string>
     <string name="menu_map_mode">View Map</string>
     <string name="sign_out">Sign out</string>
+    <string name="measurement_system">Measurement system</string>
+    <string name="metric">Metric</string>
+    <string name="imperial">Imperial</string>
 
     <string-array name="linksToWeatherPictures">
         <item>https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1050&amp;q=80</item>

@@ -48,8 +48,6 @@ import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.ListWeather;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.antonageev.weatherapp.services.LocationUpdateService;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -63,7 +61,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -392,7 +389,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -428,7 +425,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
 
-        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.UNITS_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherForecast>() {
                     @Override
                     public void onResponse(Call<WeatherForecast> call, Response<WeatherForecast> response) {

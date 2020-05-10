@@ -67,6 +67,9 @@
     <string name="action_map">Геоданные</string>
     <string name="menu_map_mode">На карте</string>
     <string name="sign_out">Выйти</string>
+    <string name="measurement_system">Система мер</string>
+    <string name="metric">Метрическая</string>
+    <string name="imperial">Имперская</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>
