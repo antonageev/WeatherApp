@@ -60,7 +60,9 @@
     <string name="didn_t_know">Хмм</string>
     <string name="yes">Да</string>
     <string name="remove">Удалить</string>
-    <string name="windDirection">Ветер: %1$s, %2$s м/с</string>
+    <string name="windDirection">Ветер: %1$s, %2$s %3$s</string>
+    <string name="windMetersPerSecond">м/с</string>
+    <string name="windMilesPerHour">миль/ч</string>
     <string name="ThunderTitle">Штормовое предупреждение</string>
     <string name="within3Hours">в течение ближайших 3-х часов ожидается гроза</string>
     <string name="viewMap">на карте</string>

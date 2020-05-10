@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,6 +64,8 @@ public class HomeFragment extends Fragment{
     private static final String CITY_TO_SHOW = "cityToShow"; // key to city in sharedPrefs
     private static final int PERMISSION_REQUEST_CODE = 100;
     private final String TAG = this.getClass().getSimpleName();
+
+    SharedPreferences sharedPreferences;
 
     static final String PARCEL = "parcel";
 
@@ -133,9 +136,8 @@ public class HomeFragment extends Fragment{
         if (localParcel == null){
             try {
                 String cityToShow = "Moscow"; // default
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                if (sharedPref != null){
-                    cityToShow = sharedPref.getString(CITY_TO_SHOW, "Paris");
+                if (sharedPreferences != null){
+                    cityToShow = sharedPreferences.getString(CITY_TO_SHOW, "Paris");
                 }
                 updateCurrentWeather(cityToShow);
                 Log.w(TAG , "parcel created: " + localParcel);
@@ -149,6 +151,7 @@ public class HomeFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         getOrInitParcel(savedInstanceState);
 
         setTextViesFromParcel(localParcel);
@@ -185,16 +188,23 @@ public class HomeFragment extends Fragment{
     }
 
     private void setTextViesFromParcel(Parcel parcel) {
-
+        String tempDegrees, windUnits;
+        if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
+            tempDegrees = "\u2109"; //F
+            windUnits = getResources().getString(R.string.windMilesPerHour);
+        } else {
+            tempDegrees = "\u2103"; //C
+            windUnits = getResources().getString(R.string.windMetersPerSecond);
+        }
         if (parcel != null){
             city.setText(parcel.getCityData().cityName);
             weatherDescription.setText(parcel.getCityData().description);
-            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", parcel.getCityData().tempMax, "\u2103"));
-            wcf.setText(String.format(Locale.getDefault(),"%.0f %s", parcel.getCityData().wcf, "\u2103"));
+            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", parcel.getCityData().tempMax, tempDegrees));
+            wcf.setText(String.format(Locale.getDefault(),"%.0f %s", parcel.getCityData().wcf, tempDegrees));
             humidity.setText(String.format(Locale.getDefault(),"%s: %d %s", getResources().getString(R.string.stringHumid),
                     parcel.getCityData().humidity, "%"));
             wind.setText(String.format(getString(R.string.windDirection), assignWindDirection(parcel.getCityData().degrees),
-                    String.format(Locale.getDefault(),"%.1f",parcel.getCityData().windSpeed)));
+                    String.format(Locale.getDefault(),"%.1f",parcel.getCityData().windSpeed), windUnits));
 
 
             if (parcel.getCityData().idResponse > 0){
@@ -206,8 +216,7 @@ public class HomeFragment extends Fragment{
                         .into(imageView);
             }
             try {
-                SharedPreferences sharedPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPrefs.edit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(CITY_TO_SHOW, parcel.getCityData().cityName);
                 editor.apply();
             } catch (NullPointerException e){
@@ -238,9 +247,13 @@ public class HomeFragment extends Fragment{
         weatherListAdapter = new WeatherListAdapter(forecast);
         recyclerView.setAdapter(weatherListAdapter);
 
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(getActivity().getDrawable(R.drawable.separator));
-        recyclerView.addItemDecoration(itemDecoration);
+        try {
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+            itemDecoration.setDrawable(Objects.requireNonNull(requireActivity().getDrawable(R.drawable.separator)));
+            recyclerView.addItemDecoration(itemDecoration);
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -283,7 +296,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(localCityName, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC), WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -313,13 +326,20 @@ public class HomeFragment extends Fragment{
             localCity = city.getText().toString();
         }
 
+        String tempDegrees;
+        if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
+            tempDegrees = "\u2109"; //F
+        } else {
+            tempDegrees = "\u2103"; //C
+        }
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
 
-        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherForecast.loadWeather(localCity, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC), WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherForecast>() {
                     @Override
                     public void onResponse(Call<WeatherForecast> call, Response<WeatherForecast> response) {
@@ -332,7 +352,7 @@ public class HomeFragment extends Fragment{
                                 map.put("day", formatDay.format(new Date((long) listWeather.getDt() * 1000L)));
                                 map.put("time", formatTime.format(new Date((long) listWeather.getDt() * 1000L)));
                                 map.put("weather", listWeather.getWeather()[0].getDescription());
-                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", listWeather.getMain().getTempMax()) + " \u2103");
+                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", listWeather.getMain().getTempMax()) +" "+ tempDegrees);
                                 resultList.add(map);
                             }
                             if (response.body().getListWeather()[0].getWeather()[0].getId() / 100 == 2) {
