@@ -66,6 +66,7 @@
     <string name="viewMap">на карте</string>
     <string name="action_map">Геоданные</string>
     <string name="menu_map_mode">На карте</string>
+    <string name="feelsLike">Ощущается:</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>

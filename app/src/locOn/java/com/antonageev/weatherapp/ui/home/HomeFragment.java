@@ -38,6 +38,7 @@ import com.antonageev.weatherapp.IOpenWeatherForecast;
 import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.MainActivity;
 import com.antonageev.weatherapp.MapWeatherLinks;
+import com.antonageev.weatherapp.MeasurementsConverter;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.R;
 import com.antonageev.weatherapp.SharedViewModel;
@@ -147,7 +148,7 @@ public class HomeFragment extends Fragment{
         return super.onOptionsItemSelected(item);
     }
 
-    public void requestForPermissions(Activity activity) {
+    private void requestForPermissions(Activity activity) {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             launchLocationService();
@@ -284,24 +285,28 @@ public class HomeFragment extends Fragment{
     }
 
     private void setTextViesFromParcel(Parcel parcel) {
-        String tempDegrees, windUnits;
-        if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
-            tempDegrees = "\u2109"; //F
-            windUnits = getResources().getString(R.string.windMilesPerHour);
-        } else {
-            tempDegrees = "\u2103"; //C
-            windUnits = getResources().getString(R.string.windMetersPerSecond);
-        }
-
         if (parcel != null){
+            String tempDegrees, windUnits;
+            if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
+                tempDegrees = "\u2109"; //F
+                windUnits = getResources().getString(R.string.windMilesPerHour);
+            } else {
+                tempDegrees = "\u2103"; //C
+                windUnits = getResources().getString(R.string.windMetersPerSecond);
+            }
+
+            float localTempMax = MeasurementsConverter.tempFromKelvinToSelectedMeasurement(parcel.getCityData().tempMax, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
+            float localWcf = MeasurementsConverter.tempFromKelvinToSelectedMeasurement(parcel.getCityData().wcf, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
+            float localWindSpeed = MeasurementsConverter.windFromMSToSelectedMeasurement(parcel.getCityData().windSpeed, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
+
             city.setText(parcel.getCityData().cityName);
             weatherDescription.setText(parcel.getCityData().description);
-            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", parcel.getCityData().tempMax, tempDegrees));
-            wcf.setText(String.format(Locale.getDefault(),"%.0f %s", parcel.getCityData().wcf, tempDegrees));
+            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", localTempMax, tempDegrees));
+            wcf.setText(String.format(Locale.getDefault(),"%s %.0f %s", getString(R.string.feelsLike), localWcf, tempDegrees));
             humidity.setText(String.format(Locale.getDefault(),"%s: %d %s", getResources().getString(R.string.stringHumid),
                     parcel.getCityData().humidity, "%"));
             wind.setText(String.format(getString(R.string.windDirection), assignWindDirection(parcel.getCityData().degrees),
-                    String.format(Locale.getDefault(),"%.1f",parcel.getCityData().windSpeed), windUnits));
+                    String.format(Locale.getDefault(),"%.1f",localWindSpeed), windUnits));
 
 
             if (parcel.getCityData().idResponse > 0){
@@ -320,10 +325,7 @@ public class HomeFragment extends Fragment{
                 Log.w(TAG, "setTextViesFromParcel: requireActivity().getPreferences == NullPointer");
                 e.printStackTrace();
             }
-
         }
-
-
     }
 
     private String assignWindDirection(int degrees){
@@ -404,7 +406,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(localCityName, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC), WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -447,7 +449,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
 
-        openWeatherForecast.loadWeather(localCity, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC), WeatherDataLoader.API_KEY)
+        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherForecast>() {
                     @Override
                     public void onResponse(Call<WeatherForecast> call, Response<WeatherForecast> response) {
@@ -460,7 +462,9 @@ public class HomeFragment extends Fragment{
                                 map.put("day", formatDay.format(new Date((long) listWeather.getDt() * 1000L)));
                                 map.put("time", formatTime.format(new Date((long) listWeather.getDt() * 1000L)));
                                 map.put("weather", listWeather.getWeather()[0].getDescription());
-                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f", listWeather.getMain().getTempMax()) +" "+ tempDegrees);
+                                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f",
+                                        MeasurementsConverter.tempFromKelvinToSelectedMeasurement(listWeather.getMain().getTempMax(),
+                                        sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC) )) +" "+ tempDegrees);
                                 resultList.add(map);
                             }
                             if (response.body().getListWeather()[0].getWeather()[0].getId() / 100 == 2) {

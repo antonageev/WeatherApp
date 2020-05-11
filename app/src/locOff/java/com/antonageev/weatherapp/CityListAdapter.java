@@ -1,6 +1,8 @@
 package com.antonageev.weatherapp;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
     private CitySource dataSource;
     private OnItemClickListener onItemClickListener;
     private Activity activity;
+    private SharedPreferences sharedPreferences;
 
     private long selectedPosition;
 
@@ -29,6 +32,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
     public CityListAdapter(CitySource dataSource, Activity activity) {
         this.dataSource = dataSource;
         this.activity = activity;
+        this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
     }
 
     public CitySource getDataSource(){
@@ -56,7 +60,9 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
         City city = cities.get(position);
         holder.getCity().setText(city.cityName);
         holder.getWeather().setText(city.description);
-        holder.getTemperature().setText(String.valueOf(city.tempMax));
+        holder.getTemperature()
+                .setText(String.format(Locale.getDefault(), "%.0f %s",MeasurementsConverter.tempFromKelvinToSelectedMeasurement
+                        (city.tempMax, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)), "\u00b0"));
         holder.getDateTime().setText(new SimpleDateFormat("dd.MM - HH:mm", Locale.getDefault()).format(new Date(city.dateTime)));
 
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {

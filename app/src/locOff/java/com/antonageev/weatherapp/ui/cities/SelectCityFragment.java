@@ -1,6 +1,7 @@
 package com.antonageev.weatherapp.ui.cities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -72,6 +73,8 @@ public class SelectCityFragment extends Fragment {
 
     SharedViewModel sharedViewModel;
 
+    private SharedPreferences sharedPreferences;
+
     public static SelectCityFragment create(int index){
         SelectCityFragment selectCityFragment = new SelectCityFragment();
         Bundle args = new Bundle();
@@ -98,6 +101,7 @@ public class SelectCityFragment extends Fragment {
         dlgCustom = new DialogCustomFragment();
 
         initViews(view);
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         setListeners();
     }
 
@@ -203,7 +207,7 @@ public class SelectCityFragment extends Fragment {
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(city, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(city, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -223,39 +227,6 @@ public class SelectCityFragment extends Fragment {
                             editTextCity.requestFocus();
                     }
                 });
-
-        //***
-
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                weatherJSONData = WeatherDataLoader.getJSONdata(city, WeatherDataLoader.WEATHER_CURRENT_DATA);
-//                if (weatherJSONData != null){
-//                    final WeatherRequest weatherRequest = (WeatherRequest) WeatherParser.renderWeatherData(weatherJSONData, WeatherDataLoader.WEATHER_CURRENT_DATA);
-////                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if (citiesWeatherList.isCityInList(city)){
-//                                Snackbar.make(getView(),"City "+ city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
-//                            } else {
-//                                cityListAdapter.addItem(renderWeather(weatherRequest));
-//                            }
-//                        }
-//                    });
-//                } else {
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            dlgCustom.show(getParentFragmentManager(), "");
-//                            editTextCity.requestFocus();
-//                        }
-//                    });
-//                    Log.e(TAG, "Connection failed");
-//                }
-//            }
-//        }).start();
     }
 
     private Map<String, String> renderWeather(WeatherRequest weatherRequest){

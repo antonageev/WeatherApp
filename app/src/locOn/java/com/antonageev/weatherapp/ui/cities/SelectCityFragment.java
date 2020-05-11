@@ -1,6 +1,7 @@
 package com.antonageev.weatherapp.ui.cities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -57,7 +58,7 @@ public class SelectCityFragment extends Fragment {
     private static final String PARCEL = "parcel";
     private final String TAG = this.getClass().getSimpleName();
 
-    Parcel currentParcel;
+    private Parcel currentParcel;
     private MaterialButton findButton;
     private TextInputEditText editTextCity;
     private RecyclerView recyclerView;
@@ -70,7 +71,9 @@ public class SelectCityFragment extends Fragment {
 
     private boolean mDualPane;
 
-    SharedViewModel sharedViewModel;
+    private SharedViewModel sharedViewModel;
+
+    private SharedPreferences sharedPreferences;
 
     public static SelectCityFragment create(int index){
         SelectCityFragment selectCityFragment = new SelectCityFragment();
@@ -98,13 +101,8 @@ public class SelectCityFragment extends Fragment {
         dlgCustom = new DialogCustomFragment();
 
         initViews(view);
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         setListeners();
-        Log.wtf(TAG, "onClick: getSupportFragmentManager(): " + getActivity().getSupportFragmentManager());
-        Log.wtf(TAG, "onClick: findFragmentById(R.id.nav_map): " + getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_map));
-        Log.wtf(TAG, "onClick: findFragmentById(R.id.nav_cities): " + getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_cities));
-        Log.wtf(TAG, "onClick: findFragmentById(R.id.nav_home): " + getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_home));
-        Log.wtf(TAG, "onClick: findFragmentById(R.id.nav_settings): " + getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_settings));
-
     }
 
     @Override
@@ -202,14 +200,13 @@ public class SelectCityFragment extends Fragment {
     }
 
     private void updateWeatherData(final String city) {
-        Handler handler = new Handler();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.openweathermap.org/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(city, WeatherDataLoader.MEASURE_METRIC, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(city, WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -229,39 +226,6 @@ public class SelectCityFragment extends Fragment {
                             editTextCity.requestFocus();
                     }
                 });
-
-        //***
-
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                weatherJSONData = WeatherDataLoader.getJSONdata(city, WeatherDataLoader.WEATHER_CURRENT_DATA);
-//                if (weatherJSONData != null){
-//                    final WeatherRequest weatherRequest = (WeatherRequest) WeatherParser.renderWeatherData(weatherJSONData, WeatherDataLoader.WEATHER_CURRENT_DATA);
-////                    final WeatherRequest weatherRequest = gson.fromJson(String.valueOf(weatherJSONdata), WeatherRequest.class);
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if (citiesWeatherList.isCityInList(city)){
-//                                Snackbar.make(getView(),"City "+ city + " already in list", BaseTransientBottomBar.LENGTH_SHORT).show();
-//                            } else {
-//                                cityListAdapter.addItem(renderWeather(weatherRequest));
-//                            }
-//                        }
-//                    });
-//                } else {
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            dlgCustom.show(getParentFragmentManager(), "");
-//                            editTextCity.requestFocus();
-//                        }
-//                    });
-//                    Log.e(TAG, "Connection failed");
-//                }
-//            }
-//        }).start();
     }
 
     private Map<String, String> renderWeather(WeatherRequest weatherRequest){
