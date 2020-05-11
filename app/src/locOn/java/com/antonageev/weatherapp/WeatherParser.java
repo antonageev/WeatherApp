@@ -22,10 +22,9 @@ public class WeatherParser {
     }
 
     public static City createCityFromWeatherRequest(WeatherRequest weatherRequest){
-//Добавить проверку на возврат нуля в случае не определенного города (тест на ЖК ГН)
         City city = new City();
         city.cityName = weatherRequest.getName();
-        city.description = weatherRequest.getWeather()[0].getMain();
+        city.description = weatherRequest.getWeather()[0].getDescription();
         city.tempMax = weatherRequest.getMain().getTemp();
         city.wcf = weatherRequest.getMain().getFeelsLike();
         city.humidity = weatherRequest.getMain().getHumidity();

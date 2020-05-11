@@ -298,7 +298,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(localCityName, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(localCityName, Locale.getDefault().getCountry(), WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
@@ -341,7 +341,7 @@ public class HomeFragment extends Fragment{
                 .build();
         IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
 
-        openWeatherForecast.loadWeather(localCity, WeatherDataLoader.API_KEY)
+        openWeatherForecast.loadWeather(localCity,  Locale.getDefault().getCountry(), WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherForecast>() {
                     @Override
                     public void onResponse(Call<WeatherForecast> call, Response<WeatherForecast> response) {

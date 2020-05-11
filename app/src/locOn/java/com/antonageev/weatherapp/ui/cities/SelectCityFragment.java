@@ -153,6 +153,7 @@ public class SelectCityFragment extends Fragment {
                 cityListAdapter = new CityListAdapter(citySource, getActivity());
                 LinearLayoutManager lt = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
                 recyclerView.setLayoutManager(lt);
+                recyclerView.hasFixedSize();
                 recyclerView.setAdapter(cityListAdapter);
                 cityListAdapter.setOnItemClickListener(new CityListAdapter.OnItemClickListener() {
                     @Override
@@ -206,7 +207,7 @@ public class SelectCityFragment extends Fragment {
                 .build();
         IOpenWeatherRequest openWeatherRequest = retrofit.create(IOpenWeatherRequest.class);
 
-        openWeatherRequest.loadWeather(city, WeatherDataLoader.API_KEY)
+        openWeatherRequest.loadWeather(city, Locale.getDefault().getCountry(), WeatherDataLoader.API_KEY)
                 .enqueue(new Callback<WeatherRequest>() {
                     @Override
                     public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
