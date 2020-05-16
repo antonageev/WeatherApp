@@ -18,7 +18,7 @@
     <string name="buttonAfterTom">Послезавтра</string>
     <string name="temp">6 С</string>
     <string name="windSpeedAndDirection">Ветер: СЗ, 2 м/с</string>
-    <string name="wcf_text">Ощущается:  </string>
+    <string name="wcf_text">Ощущается:</string>
     <string name="windChillFactor">3 С</string>
     <string name="stringHumid">Влажность</string>
     <string name="stringWeatherDescription">Облачно</string>
@@ -68,11 +68,13 @@
     <string name="viewMap">на карте</string>
     <string name="action_map">Геоданные</string>
     <string name="menu_map_mode">На карте</string>
-    <string name="sign_out">Выйти</string>
+    <string name="menu_map_mode_normal">Normal</string>
+    <string name="menu_map_mode_satellite">Satellite</string>
+    <string name="menu_map_mode_terrain">Terrain</string>
     <string name="measurement_system">Система мер</string>
     <string name="metric">Метрическая</string>
     <string name="imperial">Имперская</string>
-    <string name="feelsLike">Ощущается:</string>
+    <string name="sign_out">Выйти</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>

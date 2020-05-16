@@ -60,7 +60,6 @@
     <string name="no">NO</string>
     <string name="yes">YES</string>
     <string name="remove">Remove</string>
-    <string name="google_maps_key" translatable="false">AIzaSyDGNSwCmw9Nc31qtN0wFMbO0KMKfyYEzOI</string>
     <string name="windDirection">Wind: %1$s, %2$s %3$s</string>
     <string name="windMetersPerSecond">m/s</string>
     <string name="windMilesPerHour">m/h</string>
@@ -69,11 +68,13 @@
     <string name="viewMap">View Map</string>
     <string name="action_map">Locate</string>
     <string name="menu_map_mode">View Map</string>
-    <string name="sign_out">Sign out</string>
+    <string name="menu_map_mode_normal">Normal</string>
+    <string name="menu_map_mode_satellite">Satellite</string>
+    <string name="menu_map_mode_terrain">Terrain</string>
     <string name="measurement_system">Measurement system</string>
     <string name="metric">Metric</string>
     <string name="imperial">Imperial</string>
-    <string name="feelsLike">Feels like:</string>
+    <string name="sign_out">Sign Out</string>
 
     <string-array name="linksToWeatherPictures">
         <item>https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1050&amp;q=80</item>

@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "562256445068",
-    "firebase_url": "https://weatherapp-d59c2.firebaseio.com",
-    "project_id": "weatherapp-d59c2",
-    "storage_bucket": "weatherapp-d59c2.appspot.com"
+    "project_number": "646907682960",
+    "firebase_url": "https://weatherapp-276617.firebaseio.com",
+    "project_id": "weatherapp-276617",
+    "storage_bucket": "weatherapp-276617.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:562256445068:android:403eb732d2b2aa1c1605a9",
+        "mobilesdk_app_id": "1:646907682960:android:b746d1e7167bd18f59f815",
         "android_client_info": {
           "package_name": "com.antonageev.weatherapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "562256445068-dvot9q95fnics5bko54qo8dsaedmd7la.apps.googleusercontent.com",
+          "client_id": "646907682960-n86c20dgelo7qcfj1rk2tj1i9cvl3o66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonageev.weatherapp",
+            "certificate_hash": "ea29c54464a39e4edcd20febc3620aba317d2033"
+          }
+        },
+        {
+          "client_id": "646907682960-e19rk089lu14369rtai1l4ie2kjtqas2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDnz_Abv-RWgfnfp2TH1KFOmV_gvuAHPDE"
+          "current_key": "AIzaSyCbXwChc5B8KNZuZVLck5H1C0N1qA4ByAA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "562256445068-dvot9q95fnics5bko54qo8dsaedmd7la.apps.googleusercontent.com",
+              "client_id": "646907682960-e19rk089lu14369rtai1l4ie2kjtqas2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
