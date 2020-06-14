@@ -317,6 +317,7 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(PARCEL, localParcel);
+        PresenterManager.getInstance().savePresenter(homePresenter, outState);
     }
 
     private void initViews(View view){

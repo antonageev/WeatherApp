@@ -53,7 +53,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SelectCityFragment extends Fragment {
+public class SelectCityFragment extends Fragment implements SelectCityView {
 
     private static final String PARCEL = "parcel";
     private final String TAG = this.getClass().getSimpleName();
@@ -81,11 +81,6 @@ public class SelectCityFragment extends Fragment {
         args.putInt("index", index);
         selectCityFragment.setArguments(args);
         return selectCityFragment;
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
     }
 
     @Override

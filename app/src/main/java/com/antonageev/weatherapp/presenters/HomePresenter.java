@@ -23,13 +23,11 @@ public class HomePresenter extends BasePresenter<HomeModel, HomeView> {
                 view.updateForecastList(weatherForecast);
             }
         };
-
-        //TODO: add consumer for forecast receiver (add in model)
     }
 
     @Override
     public void updateView() {
-//        view.setTextViesFromParcel();
+        model.getOrInitParcel();
     }
 
     @Override
