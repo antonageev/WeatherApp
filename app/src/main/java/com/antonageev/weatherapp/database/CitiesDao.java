@@ -33,6 +33,9 @@ public interface CitiesDao {
     @Query("SELECT * FROM city")
     List<City> getAllCities();
 
+    @Query("SELECT * FROM city ORDER BY dateTime DESC LIMIT 1")
+    City getLastAddedCity();
+
     @Query("SELECT COUNT() FROM city")
     long getCountCities();
 }

@@ -29,6 +29,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.antonageev.weatherapp.broadcastreceivers.NetworkStateReceiver;
 
+import com.antonageev.weatherapp.dagger.DaggerAppCompatActivityModule;
+import com.antonageev.weatherapp.dagger.DaggerPreferencesModule;
+import com.antonageev.weatherapp.dagger.DaggerSharedViewModelComponent;
+import com.antonageev.weatherapp.dagger.DaggerViewModelModule;
+import com.antonageev.weatherapp.dagger.SharedViewModelComponent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -38,6 +43,8 @@ import com.google.firebase.iid.InstanceIdResult;
 public class MainActivity extends AppCompatActivity {
 
     public static String KEY_DARK_THEME = "keyDarkTheme";
+
+    public static SharedViewModelComponent viewModelComponent;
 
     private static final String TAG = MainActivity.class.getSimpleName();
     NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
@@ -59,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        viewModelComponent = DaggerSharedViewModelComponent.builder()
+                .daggerAppCompatActivityModule(new DaggerAppCompatActivityModule(this))
+                .daggerViewModelModule(new DaggerViewModelModule())
+                .daggerPreferencesModule(new DaggerPreferencesModule())
+                .build();
+
         setContentView(R.layout.activity_main);
         initNotificationChannel();
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -83,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
         connectivityChecker = new ConnectivityChecker(this);
 
         registerReceiver(networkStateReceiver, new IntentFilter("com.antonageev.weatherapp.NetworkStateChange"));
+    }
+
+    public static SharedViewModelComponent getViewModelComponent() {
+        return viewModelComponent;
     }
 
 

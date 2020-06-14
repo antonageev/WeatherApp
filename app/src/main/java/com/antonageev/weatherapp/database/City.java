@@ -11,31 +11,112 @@ import java.io.Serializable;
 public class City implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
-    public long idCity;
+    private long idCity;
 
     @ColumnInfo(name = "city_name")
-    public String cityName;
+    private String cityName;
 
     @ColumnInfo(name = "description")
-    public String description;
+    private String description;
 
     @ColumnInfo(name = "temp_max")
-    public float tempMax;
+    private float tempMax;
 
     @ColumnInfo(name = "wcf")
-    public float wcf;
+    private float wcf;
 
     @ColumnInfo(name = "humidity")
-    public int humidity;
+    private int humidity;
 
     @ColumnInfo(name = "speed")
-    public float windSpeed;
+    private float windSpeed;
 
     @ColumnInfo(name = "deg")
-    public int degrees;
+    private int degrees;
 
-    public long dateTime;
+    @ColumnInfo(name = "dateTime")
+    private long dateTime;
 
     @ColumnInfo(name = "id_response")
-    public int idResponse;
+    private int idResponse;
+
+    public long getIdCity() {
+        return idCity;
+    }
+
+    public void setIdCity(long idCity) {
+        this.idCity = idCity;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public float getTempMax() {
+        return tempMax;
+    }
+
+    public void setTempMax(float tempMax) {
+        this.tempMax = tempMax;
+    }
+
+    public float getWcf() {
+        return wcf;
+    }
+
+    public void setWcf(float wcf) {
+        this.wcf = wcf;
+    }
+
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(int humidity) {
+        this.humidity = humidity;
+    }
+
+    public float getWindSpeed() {
+        return windSpeed;
+    }
+
+    public void setWindSpeed(float windSpeed) {
+        this.windSpeed = windSpeed;
+    }
+
+    public int getDegrees() {
+        return degrees;
+    }
+
+    public void setDegrees(int degrees) {
+        this.degrees = degrees;
+    }
+
+    public long getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(long dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public int getIdResponse() {
+        return idResponse;
+    }
+
+    public void setIdResponse(int idResponse) {
+        this.idResponse = idResponse;
+    }
 }

@@ -26,6 +26,10 @@ public class CitySource {
         return citiesDao.findCityByName(findCity);
     }
 
+    public City getLastAddedCity() {
+        return citiesDao.getLastAddedCity();
+    }
+
     public void deleteCityByName(String delCity){
         citiesDao.deleteCityByName(delCity);
         loadCities();

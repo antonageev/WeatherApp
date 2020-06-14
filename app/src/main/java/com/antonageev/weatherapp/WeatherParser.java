@@ -23,15 +23,15 @@ public class WeatherParser {
 
     public static City createCityFromWeatherRequest(WeatherRequest weatherRequest){
         City city = new City();
-        city.cityName = weatherRequest.getName();
-        city.description = weatherRequest.getWeather()[0].getDescription();
-        city.tempMax = weatherRequest.getMain().getTemp();
-        city.wcf = weatherRequest.getMain().getFeelsLike();
-        city.humidity = weatherRequest.getMain().getHumidity();
-        city.degrees = weatherRequest.getWind().getDeg();
-        city.windSpeed = weatherRequest.getWind().getSpeed();
-        city.dateTime = (long)weatherRequest.getDt() * 1000L;
-        city.idResponse = weatherRequest.getWeather()[0].getId();
+        city.setCityName(weatherRequest.getName());
+        city.setDescription(weatherRequest.getWeather()[0].getDescription());
+        city.setTempMax(weatherRequest.getMain().getTemp());
+        city.setWcf(weatherRequest.getMain().getFeelsLike());
+        city.setHumidity(weatherRequest.getMain().getHumidity());
+        city.setDegrees(weatherRequest.getWind().getDeg());
+        city.setWindSpeed(weatherRequest.getWind().getSpeed());
+        city.setDateTime((long)weatherRequest.getDt() * 1000L);
+        city.setIdResponse(weatherRequest.getWeather()[0].getId());
 
         return city;
     }

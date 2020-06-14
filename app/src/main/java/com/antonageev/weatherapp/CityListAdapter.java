@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.antonageev.weatherapp.database.City;
@@ -58,17 +59,17 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
     public void onBindViewHolder(@NonNull CityListAdapter.ViewHolder holder, int position) {
         List<City> cities = dataSource.getCities();
         City city = cities.get(position);
-        holder.getCity().setText(city.cityName);
-        holder.getWeather().setText(city.description);
+        holder.getCity().setText(city.getCityName());
+        holder.getWeather().setText(city.getDescription());
         holder.getTemperature()
                 .setText(String.format(Locale.getDefault(), "%.0f %s",MeasurementsConverter.tempFromKelvinToSelectedMeasurement
-                        (city.tempMax, sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)), "\u00b0"));
-        holder.getDateTime().setText(new SimpleDateFormat("dd.MM - HH:mm", Locale.getDefault()).format(new Date(city.dateTime)));
+                        (city.getTempMax(), sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)), "\u00b0"));
+        holder.getDateTime().setText(new SimpleDateFormat("dd.MM - HH:mm", Locale.getDefault()).format(new Date(city.getDateTime())));
 
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                selectedCity = city.cityName;
+                selectedCity = city.getCityName();
                 selectedPosition = position;
                 return false;
             }
