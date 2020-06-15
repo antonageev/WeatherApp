@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_home">Погода</string>
+    <string name="menu_cities">Выбор города</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_map">Карта</string>
+
+    <string name="cityName">Москва</string>
+    <string name="buttonToday">Сегодня</string>
+    <string name="buttonTom">Завтра</string>
+    <string name="buttonAfterTom">Послезавтра</string>
+    <string name="temp">6 С</string>
+    <string name="windSpeedAndDirection">Ветер: СЗ, 2 м/с</string>
+    <string name="wcf_text">Ощущается:  </string>
+    <string name="windChillFactor">3 С</string>
+    <string name="stringHumid">Влажность</string>
+    <string name="stringWeatherDescription">Облачно</string>
+    <string name="stringContent">Почасовой прогноз на СЕГОДНЯ через ViewPager</string>
+    <string name="stringContentTom">Почасовой прогноз на ЗАВТРА через ViewPager</string>
+    <string name="stringContentAfterTom">Почасовой прогноз на ПОСЛЕЗАВТРА</string>
+    <string name="enter_city_name">Город</string>
+    <string name="backButton">Назад</string>
+    <string name="findButton">Поиск</string>
+    <string name="buttonChangeCity">Города</string>
+    <string name="textCity1">Нью ЙОрк</string>
+    <string name="textWeather">Ясно</string>
+    <string name="textTemperature">13 C</string>
+    <string name="textTemperature1">4 C</string>
+    <string name="textCity2">Токио</string>
+    <string name="cloudy_rainy">Дождь</string>
+    <string name="settings">Настройки</string>
+    <string name="textDarkTheme">Темная тема</string>
+    <string name="textSwitchDarkThemeOff">Выкл</string>
+    <string name="textSwitchDarkThemeOn">Вкл</string>
+    <string name="wind_speed">Скорость ветра</string>
+    <string name="metersPerSecond">м/с</string>
+    <string name="kilometers">км/ч</string>
+    <string name="settingsTemperature">Temperature</string>
+    <string name="settingsTextCelsius">Цельсий</string>
+    <string name="settingsTextFahrenheit">Фаренгейт</string>
+    <string name="about_city">О городе</string>
+    <string name="urlNewYork">https://ru.wikipedia.org/wiki/Нью-Йорк</string>
+    <string name="urlTokyo">https://ru.wikipedia.org/wiki/Токио</string>
+    <string name="urlMoscow">https://ru.wikipedia.org/wiki/Москва</string>
+    <string name="snackBarSure">Вы уверены?</string>
+    <string name="confirm">ОК</string>
+    <string name="Sorry">Простите, конечно!</string>
+    <string name="cityNotFoundExclamation">Но похоже, что годод %1$s не cуществует</string>
+    <string name="cityForecastDownloadFailed">Не могу загрузить данные для города %1$s</string>
+    <string name="cityAlreadyInList">Город %1$s уже в списке</string>
+    <string name="no">Нет</string>
+    <string name="OKBtn">ОК</string>
+    <string name="didn_t_know">Хмм</string>
+    <string name="yes">Да</string>
+    <string name="remove">Удалить</string>
+    <string name="windDirection">Ветер: %1$s, %2$s м/с</string>
+    <string name="ThunderTitle">Штормовое предупреждение</string>
+    <string name="within3Hours">в течение ближайших 3-х часов ожидается гроза</string>
+    <string name="viewMap">на карте</string>
+    <string name="action_map">Геоданные</string>
+    <string name="menu_map_mode">На карте</string>
+
+    <string-array name="linksToWeatherPictures">
+        <item></item>
+    </string-array>
+
+    <string-array name="days">
+        <item>Сегодня</item>
+        <item>Завтра</item>
+        <item>Послезавтра</item>
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+    </string-array>
+    <string-array name="weathers">
+        <item>Дождь</item>
+        <item>Солнечно</item>
+        <item>Снег</item>
+        <item>Дождь</item>
+        <item>Солнечно</item>
+        <item>Снег</item>
+        <item>Дождь</item>
+    </string-array>
+    <string-array name="maxTemperatures">
+        <item>16 C</item>
+        <item>8 C</item>
+        <item>-2 C</item>
+        <item>16 C</item>
+        <item>8 C</item>
+        <item>-2 C</item>
+        <item>-2 C</item>
+    </string-array>
+    <string-array name="windDirection">
+        <item>СВ</item>
+        <item>В</item>
+        <item>ЮВ</item>
+        <item>Ю</item>
+        <item>ЮЗ</item>
+        <item>З</item>
+        <item>СЗ</item>
+        <item>С</item>
+    </string-array>
+</resources>

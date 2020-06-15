@@ -10,6 +10,7 @@
     <string name="menu_home">Погода</string>
     <string name="menu_cities">Выбор города</string>
     <string name="menu_settings">Настройки</string>
+    <string name="menu_map">Карта</string>
 
     <string name="cityName">Москва</string>
     <string name="buttonToday">Сегодня</string>
@@ -62,6 +63,10 @@
     <string name="windDirection">Ветер: %1$s, %2$s м/с</string>
     <string name="ThunderTitle">Штормовое предупреждение</string>
     <string name="within3Hours">в течение ближайших 3-х часов ожидается гроза</string>
+    <string name="viewMap">на карте</string>
+    <string name="action_map">Геоданные</string>
+    <string name="menu_map_mode">На карте</string>
+    <string name="sign_out">Выйти</string>
 
     <string-array name="linksToWeatherPictures">
         <item></item>
