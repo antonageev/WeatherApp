@@ -7,7 +7,7 @@ import com.antonageev.weatherapp.ui.cities.SelectCityFragment;
 
 import dagger.Component;
 
-@Component(modules = {DaggerAppCompatActivityModule.class, DaggerViewModelModule.class, DaggerPreferencesModule.class})
+@Component(modules = {DaggerAppCompatActivityModule.class, DaggerViewModelModule.class, DaggerPreferencesModule.class, DaggerNetModule.class})
 public interface SharedViewModelComponent {
     void injectToHomeModel(HomeModel homeModel);
     void injectToCityListAdapter(CityListAdapter cityListAdapter);

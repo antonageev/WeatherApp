@@ -30,6 +30,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.antonageev.weatherapp.broadcastreceivers.NetworkStateReceiver;
 
 import com.antonageev.weatherapp.dagger.DaggerAppCompatActivityModule;
+import com.antonageev.weatherapp.dagger.DaggerNetModule;
 import com.antonageev.weatherapp.dagger.DaggerPreferencesModule;
 import com.antonageev.weatherapp.dagger.DaggerSharedViewModelComponent;
 import com.antonageev.weatherapp.dagger.DaggerViewModelModule;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 .daggerAppCompatActivityModule(new DaggerAppCompatActivityModule(this))
                 .daggerViewModelModule(new DaggerViewModelModule())
                 .daggerPreferencesModule(new DaggerPreferencesModule())
+                .daggerNetModule(new DaggerNetModule())
                 .build();
 
         setContentView(R.layout.activity_main);
