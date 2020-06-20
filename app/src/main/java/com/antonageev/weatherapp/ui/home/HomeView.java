@@ -1,10 +1,11 @@
 package com.antonageev.weatherapp.ui.home;
 
 import com.antonageev.weatherapp.Parcel;
-import com.antonageev.weatherapp.database.City;
-import com.antonageev.weatherapp.model_forecast.WeatherForecast;
+
+import java.util.List;
+import java.util.Map;
 
 public interface HomeView {
-    void updateForecastList(WeatherForecast weatherForecast);
-    void setTextViesFromParcel(Parcel parcel);
+//    void updateForecastList(List<Map<String, String>> weatherForecastMap);
+    void setTextViesFromMap(Map<String, String> weatherMap);
 }
