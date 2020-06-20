@@ -10,18 +10,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,29 +21,32 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.antonageev.weatherapp.CircleTransformation;
-import com.antonageev.weatherapp.IOpenWeatherForecast;
-import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.MainActivity;
 import com.antonageev.weatherapp.MapWeatherLinks;
 import com.antonageev.weatherapp.MeasurementsConverter;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.PresenterManager;
 import com.antonageev.weatherapp.R;
-import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherListAdapter;
-import com.antonageev.weatherapp.WeatherParser;
-import com.antonageev.weatherapp.database.City;
-import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.ListWeather;
+import com.antonageev.weatherapp.model_forecast.Main;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.antonageev.weatherapp.presenters.HomePresenter;
 import com.antonageev.weatherapp.services.LocationUpdateService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -67,11 +58,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import javax.inject.Inject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,6 +70,7 @@ public class HomeFragment extends Fragment implements HomeView{
     private static final int PERMISSION_REQUEST_CODE = 100;
     private final String TAG = this.getClass().getSimpleName();
 
+    @Inject
     SharedPreferences sharedPreferences;
 
     static final String PARCEL = "parcel";
@@ -121,15 +109,10 @@ public class HomeFragment extends Fragment implements HomeView{
 
     private HomePresenter homePresenter;
 
-    public HomeFragment(Parcel parcel){
-        this.localParcel = parcel;
-    }
-
-    public HomeFragment(){}
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        MainActivity.getViewModelComponent().injectToHomeFragment(this);
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
@@ -191,7 +174,6 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
-        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         initListeners();
 
         if (savedInstanceState == null) {
@@ -203,7 +185,7 @@ public class HomeFragment extends Fragment implements HomeView{
         citiesSelect.setVisibility(View.INVISIBLE);
         buttonSettings.setVisibility(View.INVISIBLE);
 
-        initRecyclerView(new ArrayList<Map<String, String>>());
+        initRecyclerView(new ArrayList<>());
 
         initBroadcastReceivers();
 

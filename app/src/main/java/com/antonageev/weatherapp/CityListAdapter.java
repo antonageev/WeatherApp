@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.antonageev.weatherapp.database.City;
@@ -20,22 +21,28 @@ import javax.inject.Inject;
 
 public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHolder>{
 
-    private CitySource dataSource;
+    private List<City> dataSource;
     private OnCityAdapterItemClickListener onCityAdapterItemClickListener;
     @Inject
     SharedPreferences sharedPreferences;
+    @Inject
+    AppCompatActivity activity;
 
     private long selectedPosition;
 
     private String selectedCity;
 
-    public CityListAdapter(CitySource dataSource) {
+    public CityListAdapter(List<City> dataSource) {
         this.dataSource = dataSource;
         MainActivity.getViewModelComponent().injectToCityListAdapter(this); // пришлось привязаться к Activity, т.к. иначе SharedPrefs не инжектировать
     }
 
-    public CitySource getDataSource(){
+    public List<City> getDataSource(){
         return dataSource;
+    }
+
+    public void setDataSource(List<City> dataSource) {
+        this.dataSource = dataSource;
     }
 
     public long getSelectedPosition(){
@@ -55,8 +62,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull CityListAdapter.ViewHolder holder, int position) {
-        List<City> cities = dataSource.getCities();
-        City city = cities.get(position);
+        City city = dataSource.get(position);
         holder.getCity().setText(city.getCityName());
         holder.getWeather().setText(city.getDescription());
         holder.getTemperature()
@@ -73,14 +79,14 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
             }
         });
 
-//        if (activity != null){
-//            activity.registerForContextMenu(holder.cardView);
-//        }
+        if (activity != null){
+            activity.registerForContextMenu(holder.cardView);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return dataSource == null ? 0 : dataSource.getCities().size();
+        return dataSource == null ? 0 : dataSource.size();
     }
 
 

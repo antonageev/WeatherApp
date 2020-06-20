@@ -11,14 +11,20 @@ import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.database.CitiesDao;
+import com.antonageev.weatherapp.database.City;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
 
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -37,10 +43,9 @@ public class SelectCityModel {
     public SelectCityModel(OnCityAdapterItemClickListener onCityAdapterItemClickListener) {
         CitiesDao citiesDao = App.getInstance().getCitiesDao();
         citySource = new CitySource(citiesDao);
-        cityListAdapter = new CityListAdapter(citySource);
+        cityListAdapter = new CityListAdapter(null);
         cityListAdapter.setOnCityAdapterItemClickListener(onCityAdapterItemClickListener);
         MainActivity.getViewModelComponent().injectToSelectCityModel(this);
-
     }
 
     public CityListAdapter getCityListAdapter() {
@@ -56,11 +61,7 @@ public class SelectCityModel {
             public void onSuccess(WeatherRequest weatherRequest) {
                 if (citySource.getCityByName(city) == null){
                     citySource.addCity(WeatherParser.createCityFromWeatherRequest(weatherRequest));
-                    cityListAdapter.notifyDataSetChanged();
-                    // TODO нельзя дергать адаптер из io(), придется делать еще один
-                    //  метод для MainThread или прекратить использовать фабрику RXJavaCallAdapterFactory,
-                    //  а просто обернуть в Single? Или отвязать адаптер от класса с обращением к БД.
-                    //
+                    updateAdapter();
                 }
             }
 
@@ -69,29 +70,27 @@ public class SelectCityModel {
                 e.printStackTrace();
             }
         });
+    }
 
-//        .enqueue(new Callback<WeatherRequest>() {
-//                    @Override
-//                    public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {
-//                        if (response.body() != null) {
-//                            if (citySource.getCityByName(city) == null){
-//                                citySource.addCity(WeatherParser.createCityFromWeatherRequest(response.body()));
-//                                cityListAdapter.notifyDataSetChanged();
-//                            } else {
-//                                Snackbar.make(getView(), String.format(getString(R.string.cityAlreadyInList), city), BaseTransientBottomBar.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<WeatherRequest> call, Throwable t) {
-//
-//                    }
-//                });
+    public Disposable updateAdapter() {
+        return Single.create((SingleOnSubscribe<List<City>>) emitter -> emitter.onSuccess(citySource.getCities()))
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
+                    cityListAdapter.setDataSource(cities);
+                    cityListAdapter.notifyDataSetChanged();
+                });
     }
 
     public void setSelectedCity(int position) {
-        sharedViewModel.saveParcel(new Parcel(cityListAdapter.getDataSource().getCities().get(position)));
+        sharedViewModel.saveParcel(new Parcel(cityListAdapter.getDataSource().get(position)));
     }
-
+    
+    public Disposable deleteSelectedCity() {
+        return Single.create((SingleOnSubscribe<List<City>>) emitter -> {
+            citySource.deleteCityByName(cityListAdapter.getSelectedCity());
+            emitter.onSuccess(citySource.getCities());
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(cities -> {
+            cityListAdapter.setDataSource(cities);
+            cityListAdapter.notifyDataSetChanged();
+        });
+    }
 }

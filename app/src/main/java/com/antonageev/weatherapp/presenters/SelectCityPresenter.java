@@ -13,10 +13,10 @@ public class SelectCityPresenter extends BasePresenter<SelectCityModel, SelectCi
 
     @Override
     public void updateView() {
-
+        model.updateAdapter();
     }
 
-    public CityListAdapter presenterGetAdapter(/*OnCityAdapterItemClickListener onCityAdapterItemClickListener*/) {
+    public CityListAdapter presenterGetAdapter() {
         return model.getCityListAdapter();
     }
 
@@ -26,6 +26,10 @@ public class SelectCityPresenter extends BasePresenter<SelectCityModel, SelectCi
 
     public void setSelectedCityByPosition(int position) {
         model.setSelectedCity(position);
+    }
+
+    public void deleteSelectedCity() {
+        model.deleteSelectedCity();
     }
 
 }
