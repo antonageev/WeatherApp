@@ -1,33 +1,31 @@
 package com.antonageev.weatherapp.presenters;
 
-import com.antonageev.weatherapp.Parcel;
-import com.antonageev.weatherapp.model_forecast.WeatherForecast;
+import com.antonageev.weatherapp.WeatherListAdapter;
 import com.antonageev.weatherapp.models.HomeModel;
 import com.antonageev.weatherapp.ui.home.HomeView;
+
+import java.util.Map;
 
 import io.reactivex.functions.Consumer;
 
 public class HomePresenter extends BasePresenter<HomeModel, HomeView> {
 
-    private Consumer<Parcel> consumerParcel;
-    private Consumer<WeatherForecast> consumerForecast;
+    private Consumer<Map<String, String>> consumerMap;
+    private Consumer<WeatherListAdapter> presenterAdapterConsumer;
 
-    public HomePresenter() {
-        consumerParcel = parcel -> {
+    public HomePresenter(Consumer<WeatherListAdapter> adapterConsumer) {
+        consumerMap = resultMap -> {
             if (view != null){
-                view.setTextViesFromParcel(parcel);
+                view.setTextViesFromMap(resultMap);
             }
         };
-        consumerForecast = weatherForecast -> {
-            if (view != null) {
-                view.updateForecastList(weatherForecast);
-            }
-        };
+        presenterAdapterConsumer = adapterConsumer;
     }
 
     @Override
     public void updateView() {
         model.getOrInitParcel();
+        model.updateAdapter();
     }
 
     @Override
@@ -39,7 +37,7 @@ public class HomePresenter extends BasePresenter<HomeModel, HomeView> {
     }
 
     private void loadData() {
-        setModel(new HomeModel(consumerParcel, consumerForecast));
+        setModel(new HomeModel(consumerMap, presenterAdapterConsumer));
     }
 
     public void presenterUpdateCurrentWeather(String cityName) {

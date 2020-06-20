@@ -10,18 +10,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,45 +21,35 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.antonageev.weatherapp.CircleTransformation;
-import com.antonageev.weatherapp.IOpenWeatherForecast;
-import com.antonageev.weatherapp.IOpenWeatherRequest;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.antonageev.weatherapp.MainActivity;
-import com.antonageev.weatherapp.MapWeatherLinks;
-import com.antonageev.weatherapp.MeasurementsConverter;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.PresenterManager;
 import com.antonageev.weatherapp.R;
-import com.antonageev.weatherapp.SharedViewModel;
-import com.antonageev.weatherapp.WeatherDataLoader;
 import com.antonageev.weatherapp.WeatherListAdapter;
-import com.antonageev.weatherapp.WeatherParser;
-import com.antonageev.weatherapp.database.City;
-import com.antonageev.weatherapp.model_current.WeatherRequest;
-import com.antonageev.weatherapp.model_forecast.ListWeather;
-import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 import com.antonageev.weatherapp.presenters.HomePresenter;
 import com.antonageev.weatherapp.services.LocationUpdateService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
-import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import javax.inject.Inject;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,10 +57,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HomeFragment extends Fragment implements HomeView{
 
     private static boolean firstLaunch = true;
-    private static final String CITY_TO_SHOW = "cityToShow"; // key to city in sharedPrefs
     private static final int PERMISSION_REQUEST_CODE = 100;
     private final String TAG = this.getClass().getSimpleName();
 
+    @Inject
     SharedPreferences sharedPreferences;
 
     static final String PARCEL = "parcel";
@@ -98,7 +76,6 @@ public class HomeFragment extends Fragment implements HomeView{
     private MaterialButton buttonSettings;
     private ImageView imageView;
     private RecyclerView recyclerView;
-    private WeatherListAdapter weatherListAdapter;
 
     private final String CITY = "city";
     private final String TEMPERATURE = "temperature";
@@ -106,30 +83,26 @@ public class HomeFragment extends Fragment implements HomeView{
     private final String WIND_CHILL_FACTOR = "wcf";
     private final String WIND = "wind";
     private final String HUMIDITY = "humidity";
-    private final String CITY_URL = "cityUrl";
 
     private int notificationMessageId = 400;
 
     private BroadcastReceiver locationBroadcastReceiver;
 
-    private String cityUrl;
+    private Disposable dAdapter;
 
-    private Parcel localParcel = null;
-    private int index = 0;
-
-    private List<Map<String, String>> forecast = new ArrayList<>();
+    private Consumer<WeatherListAdapter> adapterConsumer = new Consumer<WeatherListAdapter>() {
+        @Override
+        public void accept(WeatherListAdapter weatherListAdapter) throws Exception {
+            recyclerView.setAdapter(weatherListAdapter);
+        }
+    };
 
     private HomePresenter homePresenter;
-
-    public HomeFragment(Parcel parcel){
-        this.localParcel = parcel;
-    }
-
-    public HomeFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        MainActivity.getViewModelComponent().injectToHomeFragment(this);
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
@@ -191,11 +164,10 @@ public class HomeFragment extends Fragment implements HomeView{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
-        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
         initListeners();
 
         if (savedInstanceState == null) {
-            homePresenter = new HomePresenter();
+            homePresenter = new HomePresenter(adapterConsumer);
         } else {
             homePresenter = PresenterManager.getInstance().restorePresenter(savedInstanceState);
         }
@@ -203,7 +175,7 @@ public class HomeFragment extends Fragment implements HomeView{
         citiesSelect.setVisibility(View.INVISIBLE);
         buttonSettings.setVisibility(View.INVISIBLE);
 
-        initRecyclerView(new ArrayList<Map<String, String>>());
+        initRecyclerView();
 
         initBroadcastReceivers();
 
@@ -216,7 +188,6 @@ public class HomeFragment extends Fragment implements HomeView{
 
 
     private void initBroadcastReceivers() {
-
         locationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -238,70 +209,22 @@ public class HomeFragment extends Fragment implements HomeView{
         super.onPause();
         getActivity().unregisterReceiver(locationBroadcastReceiver);
         homePresenter.unbindView(this);
+        if (dAdapter != null && !dAdapter.isDisposed()) dAdapter.dispose();
     }
 
     @Override
-    public void setTextViesFromParcel(Parcel parcel) {
-        if (parcel != null){
-            String tempDegrees, windUnits;
-            if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
-                tempDegrees = "\u2109"; //F
-                windUnits = getResources().getString(R.string.windMilesPerHour);
-            } else {
-                tempDegrees = "\u2103"; //C
-                windUnits = getResources().getString(R.string.windMetersPerSecond);
-            }
-
-            float localTempMax = MeasurementsConverter.tempFromKelvinToSelectedMeasurement(parcel.getCityData().getTempMax(), sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
-            float localWcf = MeasurementsConverter.tempFromKelvinToSelectedMeasurement(parcel.getCityData().getWcf(), sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
-            float localWindSpeed = MeasurementsConverter.windFromMSToSelectedMeasurement(parcel.getCityData().getWindSpeed(), sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC));
-
-            city.setText(parcel.getCityData().getCityName());
-            weatherDescription.setText(parcel.getCityData().getDescription());
-            temperature.setText(String.format(Locale.getDefault(), "%.0f %s", localTempMax, tempDegrees));
-            wcf.setText(String.format(Locale.getDefault(),"%s %.0f %s", getString(R.string.wcf_text), localWcf, tempDegrees));
-            humidity.setText(String.format(Locale.getDefault(),"%s: %d %s", getResources().getString(R.string.stringHumid),
-                    parcel.getCityData().getHumidity(), "%"));
-            wind.setText(String.format(getString(R.string.windDirection), assignWindDirection(parcel.getCityData().getDegrees()),
-                    String.format(Locale.getDefault(),"%.1f",localWindSpeed), windUnits));
-
-
-            if (parcel.getCityData().getIdResponse() > 0){
-                Picasso.get()
-                        .load(MapWeatherLinks.getLinkFromMap(parcel.getCityData().getIdResponse() / 100))
-                        .resize(100, 100)
-                        .centerCrop()
-                        .transform(new CircleTransformation())
-                        .into(imageView);
-            }
-            try {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(CITY_TO_SHOW, parcel.getCityData().getCityName());
-                editor.apply();
-            } catch (NullPointerException e){
-                Log.w(TAG, "setTextViesFromParcel: requireActivity().getPreferences == NullPointer");
-                e.printStackTrace();
-            }
-        }
+    public void setTextViesFromMap(Map<String, String> weatherMap) {
+            city.setText(weatherMap.get(CITY));
+            weatherDescription.setText(weatherMap.get(WEATHER));
+            temperature.setText(weatherMap.get(TEMPERATURE));
+            wcf.setText(weatherMap.get(WIND_CHILL_FACTOR));
+            humidity.setText(weatherMap.get(HUMIDITY));
+            wind.setText(weatherMap.get(WIND));
     }
 
-    private String assignWindDirection(int degrees){
-        if (degrees > 22 && degrees <= 67) return getResources().getStringArray(R.array.windDirection)[0];
-        if (degrees > 68 && degrees <= 112) return getResources().getStringArray(R.array.windDirection)[1];
-        if (degrees > 112 && degrees <= 157) return getResources().getStringArray(R.array.windDirection)[2];
-        if (degrees > 157 && degrees <= 202) return getResources().getStringArray(R.array.windDirection)[3];
-        if (degrees > 202 && degrees <= 247) return getResources().getStringArray(R.array.windDirection)[4];
-        if (degrees > 247 && degrees <= 292) return getResources().getStringArray(R.array.windDirection)[5];
-        if (degrees > 292 && degrees <= 337) return getResources().getStringArray(R.array.windDirection)[6];
-        if (degrees > 337 || degrees <= 22) return getResources().getStringArray(R.array.windDirection)[7];
-        return "unknown";
-    }
-
-    private void initRecyclerView(List<Map<String, String>> forecast) {
+    private void initRecyclerView() {
         LinearLayoutManager ltManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(ltManager);
-        weatherListAdapter = new WeatherListAdapter(forecast);
-        recyclerView.setAdapter(weatherListAdapter);
 
         try {
             DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
@@ -316,7 +239,6 @@ public class HomeFragment extends Fragment implements HomeView{
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(PARCEL, localParcel);
         PresenterManager.getInstance().savePresenter(homePresenter, outState);
     }
 
@@ -339,38 +261,7 @@ public class HomeFragment extends Fragment implements HomeView{
         viewMap.setOnClickListener(v -> Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(R.id.nav_map));
     }
 
-
-    @Override
-    public void updateForecastList(WeatherForecast weatherForecast) {
-        if (weatherForecast != null) {
-
-            String tempDegrees;
-            if ((sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC)).equals(WeatherDataLoader.MEASURE_IMPERIAL)) {
-                tempDegrees = "\u2109"; //F
-            } else {
-                tempDegrees = "\u2103"; //C
-            }
-
-            SimpleDateFormat formatDay = new SimpleDateFormat("EEEE,", Locale.getDefault());
-            SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            List<Map<String, String>> resultList = new ArrayList<>();
-            for (ListWeather listWeather : weatherForecast.getListWeather()) {
-                Map<String, String> map = new HashMap<>();
-                map.put("day", formatDay.format(new Date((long) listWeather.getDt() * 1000L)));
-                map.put("time", formatTime.format(new Date((long) listWeather.getDt() * 1000L)));
-                map.put("weather", listWeather.getWeather()[0].getDescription());
-                map.put("maxTemperature", String.format(Locale.getDefault(), "%.0f",
-                        MeasurementsConverter.tempFromKelvinToSelectedMeasurement(listWeather.getMain().getTempMax(),
-                                sharedPreferences.getString(WeatherDataLoader.KEY_MEASUREMENT, WeatherDataLoader.MEASURE_METRIC) )) +" "+ tempDegrees);
-                resultList.add(map);
-            }
-            if (weatherForecast.getListWeather()[0].getWeather()[0].getId() / 100 == 2) {
-                makeNotification();
-            }
-            weatherListAdapter.weatherListDataChange(resultList);
-        }
-    }
-
+    //TODO поставить нотификацию
     private void makeNotification() {
         NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), "1")

@@ -1,7 +1,5 @@
 package com.antonageev.weatherapp;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.antonageev.weatherapp.database.City;
@@ -19,25 +17,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHolder>{
 
-    private CitySource dataSource;
-    private OnItemClickListener onItemClickListener;
-    private Activity activity;
-    private SharedPreferences sharedPreferences;
+    private List<City> dataSource;
+    private OnCityAdapterItemClickListener onCityAdapterItemClickListener;
+    @Inject
+    SharedPreferences sharedPreferences;
+    @Inject
+    AppCompatActivity activity;
 
     private long selectedPosition;
 
     private String selectedCity;
 
-    public CityListAdapter(CitySource dataSource, Activity activity) {
+    public CityListAdapter(List<City> dataSource) {
         this.dataSource = dataSource;
-        this.activity = activity;
-        this.sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE);
+        MainActivity.getViewModelComponent().injectToCityListAdapter(this); // пришлось привязаться к Activity, т.к. иначе SharedPrefs не инжектировать
     }
 
-    public CitySource getDataSource(){
+    public List<City> getDataSource(){
         return dataSource;
+    }
+
+    public void setDataSource(List<City> dataSource) {
+        this.dataSource = dataSource;
     }
 
     public long getSelectedPosition(){
@@ -57,8 +62,7 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull CityListAdapter.ViewHolder holder, int position) {
-        List<City> cities = dataSource.getCities();
-        City city = cities.get(position);
+        City city = dataSource.get(position);
         holder.getCity().setText(city.getCityName());
         holder.getWeather().setText(city.getDescription());
         holder.getTemperature()
@@ -82,15 +86,12 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return dataSource == null ? 0 : dataSource.getCities().size();
+        return dataSource == null ? 0 : dataSource.size();
     }
 
-    public interface OnItemClickListener{
-        void onItemClick(View view, int position);
-    }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
+    public void setOnCityAdapterItemClickListener(OnCityAdapterItemClickListener onCityAdapterItemClickListener) {
+        this.onCityAdapterItemClickListener = onCityAdapterItemClickListener;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -111,8 +112,8 @@ public class CityListAdapter extends RecyclerView.Adapter<CityListAdapter.ViewHo
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (onItemClickListener != null){
-                        onItemClickListener.onItemClick(v, getAdapterPosition());
+                    if (onCityAdapterItemClickListener != null){
+                        onCityAdapterItemClickListener.onItemClick(v, getAdapterPosition());
                     }
                 }
             });

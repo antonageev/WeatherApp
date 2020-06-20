@@ -24,10 +24,7 @@ public class App extends Application {
         instance = this;
 
         db = Room.databaseBuilder(getApplicationContext(), CitiesDatabase.class, "cities_database")
-                .allowMainThreadQueries()
                 .build();
-
-
     }
 
     public CitiesDao getCitiesDao(){

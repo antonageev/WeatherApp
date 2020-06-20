@@ -3,17 +3,21 @@ package com.antonageev.weatherapp.models;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.antonageev.weatherapp.DataConverter;
 import com.antonageev.weatherapp.IOpenWeatherForecast;
 import com.antonageev.weatherapp.IOpenWeatherRequest;
 import com.antonageev.weatherapp.MainActivity;
 import com.antonageev.weatherapp.Parcel;
 import com.antonageev.weatherapp.SharedViewModel;
 import com.antonageev.weatherapp.WeatherDataLoader;
+import com.antonageev.weatherapp.WeatherListAdapter;
 import com.antonageev.weatherapp.WeatherParser;
 import com.antonageev.weatherapp.model_current.WeatherRequest;
 import com.antonageev.weatherapp.model_forecast.WeatherForecast;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -41,8 +45,29 @@ public class HomeModel {
     private static final String CITY_TO_SHOW = "cityToShow"; // key to city in sharedPrefs
 
     private Parcel localParcel;
-    private Consumer<Parcel> modelConsumerParcel;
-    private Consumer<WeatherForecast> modelConsumerForecast;
+    private WeatherListAdapter weatherListAdapter;
+    private List<Map<String, String>> adapterSource;
+
+    private Consumer<Map<String, String>> consumerMap;
+
+    private Consumer<Parcel> modelConsumerParcel = new Consumer<Parcel>() {
+        @Override
+        public void accept(Parcel parcel) throws Exception {
+            Single.create((SingleOnSubscribe<Map<String, String>>) emitter -> {
+                emitter.onSuccess(DataConverter.getInstance().convertParcelUsingPreferences(parcel));
+            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumerMap);
+        }
+    };
+
+    private Consumer<WeatherForecast> modelConsumerForecast = new Consumer<WeatherForecast>() {
+        @Override
+        public void accept(WeatherForecast weatherForecast) throws Exception {
+            adapterSource = DataConverter.getInstance().convertForecastToListMap(weatherForecast);
+            updateAdapter();
+        }
+    };
+
+    private Consumer<WeatherListAdapter> modelAdapterConsumer;
 
     private Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/")
@@ -52,10 +77,11 @@ public class HomeModel {
     private IOpenWeatherForecast openWeatherForecast = retrofit.create(IOpenWeatherForecast.class);
 
 
-    public HomeModel(Consumer<Parcel> consumerParcel , Consumer<WeatherForecast> consumerForecast) {
-        modelConsumerParcel = consumerParcel;
-        modelConsumerForecast = consumerForecast;
+    public HomeModel(Consumer<Map<String, String>> consumerMap, Consumer<WeatherListAdapter> adapterConsumer) {
         MainActivity.getViewModelComponent().injectToHomeModel(this); // пришлось привязаться к Activity, т.к. иначе ViewModel не инжектировать.
+        this.consumerMap = consumerMap;
+        weatherListAdapter = new WeatherListAdapter(null);
+        modelAdapterConsumer = adapterConsumer;
     }
 
     public void getOrInitParcel() {
@@ -89,6 +115,14 @@ public class HomeModel {
                                 localParcel = new Parcel(WeatherParser.createCityFromWeatherRequest(response.body()));
                                 emitter.onSuccess(localParcel);
                                 updateForecast(localCityName);
+                                try {
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(CITY_TO_SHOW, localCityName);
+                                    editor.apply();
+                                } catch (NullPointerException e){
+                                    Log.w(TAG, "updateCurrentWeather() - failed to put in SharedPrefs");
+                                    e.printStackTrace();
+                                }
                             }
                         }
 
@@ -118,5 +152,16 @@ public class HomeModel {
                         }
                     });
         }).retry(2).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(modelConsumerForecast);
+    }
+
+    public void updateAdapter() {
+        Single.create((SingleOnSubscribe<WeatherListAdapter>) emitter -> {
+            emitter.onSuccess(weatherListAdapter);
+        }).subscribe(modelAdapterConsumer);
+        weatherListAdapter.weatherListDataChange(adapterSource);
+    }
+
+    public WeatherListAdapter getWeatherListAdapter() {
+        return weatherListAdapter;
     }
 }
